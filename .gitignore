@@ -1,0 +1,22 @@
+# Roblox Studio
+*.rbxl.lock
+*.rbxlx.lock
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
