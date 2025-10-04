@@ -121,10 +121,10 @@ The script accepts optional parameters:
 
 ```powershell
 # Default usage (auto-detects paths)
-.\Complete-RbxlxFile.ps1
+.\Build-CompleteRbxlx.ps1
 
-# Custom paths
-.\Complete-RbxlxFile.ps1 -ProjectPath "C:\MyProject" -RbxlxFile "C:\MyProject\game.rbxlx" -OutputFile "C:\Output\complete.rbxlx"
+# Custom output file name (optional)
+.\Build-CompleteRbxlx.ps1 -OutputFile "MyCustomName.rbxlx"
 ```
 
 ### Parameters:
