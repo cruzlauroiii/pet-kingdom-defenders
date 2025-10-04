@@ -8,6 +8,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local DataManager = require(ServerScriptService.Modules.DataManager)
 local SecurityManager = require(ServerScriptService.Modules.SecurityManager)
+local ProceduralPetGenerator = require(ServerScriptService.Modules.ProceduralPetGenerator)
 local Config = require(ReplicatedStorage.Shared.Config)
 local PetData = require(ReplicatedStorage.Shared.PetData)
 
@@ -259,25 +260,42 @@ function PetSystem:SpawnPet(player, petId)
 	local character = player.Character
 	if not character then return end
 
-	-- Create pet model (simplified - would use actual models in production)
-	local petModel = Instance.new("Part")
-	petModel.Name = "Pet_" .. petId
-	petModel.Size = Vector3.new(2, 2, 2)
-	petModel.Shape = Enum.PartType.Ball
-	petModel.Anchored = false
-	petModel.CanCollide = false
-	petModel.BrickColor = petData.Shiny and BrickColor.new("Gold") or BrickColor.random()
+	-- Create pet model using ProceduralPetGenerator (NO mesh IDs!)
+	local petInfo = PetData[petData.Name]
+	local petModel = ProceduralPetGenerator:GeneratePet(petData.Name, petData.Rarity, petData.Shiny)
 
-	-- Add floating effect
+	if not petModel then
+		warn("[PetSystem] Failed to generate pet model for:", petData.Name)
+		return
+	end
+
+	petModel.Name = "Pet_" .. petId
+
+	-- Get or create the primary part for movement
+	local primaryPart = petModel.PrimaryPart or petModel:FindFirstChildOfClass("Part")
+	if not primaryPart then
+		warn("[PetSystem] Pet model has no valid parts!")
+		return
+	end
+
+	-- Add floating effect to primary part
 	local bodyPosition = Instance.new("BodyPosition")
 	bodyPosition.MaxForce = Vector3.new(50000, 50000, 50000)
-	bodyPosition.Parent = petModel
+	bodyPosition.Parent = primaryPart
 
 	local bodyGyro = Instance.new("BodyGyro")
 	bodyGyro.MaxTorque = Vector3.new(5000, 5000, 5000)
-	bodyGyro.Parent = petModel
+	bodyGyro.Parent = primaryPart
 
-	petModel.Parent = workspace.Pets or workspace
+	-- Ensure Pets folder exists
+	local petsFolder = workspace:FindFirstChild("Pets")
+	if not petsFolder then
+		petsFolder = Instance.new("Folder")
+		petsFolder.Name = "Pets"
+		petsFolder.Parent = workspace
+	end
+
+	petModel.Parent = petsFolder
 
 	-- Store reference
 	if not self.ActivePets[player.UserId] then
@@ -285,6 +303,7 @@ function PetSystem:SpawnPet(player, petId)
 	end
 	self.ActivePets[player.UserId][petId] = {
 		Model = petModel,
+		PrimaryPart = primaryPart,
 		Data = petData,
 		BodyPosition = bodyPosition,
 		BodyGyro = bodyGyro
@@ -336,9 +355,10 @@ function PetSystem:PetFollowLoop(player, petId)
 
 		local targetPosition = humanoidRootPart.Position + Vector3.new(offsetX, offsetY, offsetZ)
 
-		-- Update position
+		-- Update position (using PrimaryPart for multi-part models)
+		local petPart = petInfo.PrimaryPart or petInfo.Model
 		petInfo.BodyPosition.Position = targetPosition
-		petInfo.BodyGyro.CFrame = CFrame.new(petInfo.Model.Position, humanoidRootPart.Position)
+		petInfo.BodyGyro.CFrame = CFrame.new(petPart.Position, humanoidRootPart.Position)
 	end
 end
 

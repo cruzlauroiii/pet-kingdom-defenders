@@ -7,6 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local DataManager = require(ServerScriptService.Modules.DataManager)
+local ProceduralEnemyGenerator = require(ServerScriptService.Modules.ProceduralEnemyGenerator)
 local Config = require(ReplicatedStorage.Shared.Config)
 
 local TowerDefenseManager = {}
@@ -68,32 +69,52 @@ function TowerDefenseManager:SpawnWaveEnemies(player, waveNumber)
 	local gameState = self.ActiveGames[player.UserId]
 	if not gameState then return end
 
-	local enemyCount = Config.TD_BASE_ENEMIES + (waveNumber * 2)
-	local enemyHealth = Config.TD_BASE_ENEMY_HEALTH * (1 + waveNumber * 0.2)
-	local enemyReward = Config.TD_BASE_REWARD * waveNumber
+	-- Use ProceduralEnemyGenerator to create wave enemies
+	local enemies = ProceduralEnemyGenerator:GenerateWave(waveNumber)
 
-	for i = 1, enemyCount do
+	-- Ensure Enemies folder exists
+	local enemiesFolder = workspace:FindFirstChild("Enemies")
+	if not enemiesFolder then
+		enemiesFolder = Instance.new("Folder")
+		enemiesFolder.Name = "Enemies"
+		enemiesFolder.Parent = workspace
+	end
+
+	for i, enemyModel in ipairs(enemies) do
 		if not gameState.IsWaveActive then break end
 
-		-- Create enemy
-		local enemy = {
-			Id = game:GetService("HttpService"):GenerateGUID(false),
-			Health = enemyHealth,
-			MaxHealth = enemyHealth,
-			Speed = Config.TD_ENEMY_SPEED,
-			Reward = enemyReward,
-			Position = 0 -- Path position
-		}
+		-- Get enemy data from model attributes
+		local enemyId = game:GetService("HttpService"):GenerateGUID(false)
+		local primaryPart = enemyModel.PrimaryPart
 
-		table.insert(gameState.ActiveEnemies, enemy)
+		if primaryPart then
+			-- Position enemy at spawn point
+			local spawnPosition = Vector3.new(-50, 5, 0) -- TD spawn point
+			enemyModel:SetPrimaryPartCFrame(CFrame.new(spawnPosition))
+			enemyModel.Name = "Enemy_" .. enemyId
+			enemyModel.Parent = enemiesFolder
 
-		-- Notify client
-		ReplicatedStorage.Remotes.EnemySpawned:FireClient(player, enemy)
+			-- Create enemy data structure
+			local enemy = {
+				Id = enemyId,
+				Model = enemyModel,
+				Health = primaryPart:GetAttribute("Health"),
+				MaxHealth = primaryPart:GetAttribute("MaxHealth"),
+				Speed = primaryPart:GetAttribute("Speed"),
+				Reward = primaryPart:GetAttribute("Reward"),
+				Position = 0 -- Path position
+			}
 
-		-- Enemy movement
-		task.spawn(function()
-			self:MoveEnemy(player, enemy)
-		end)
+			table.insert(gameState.ActiveEnemies, enemy)
+
+			-- Notify client
+			ReplicatedStorage.Remotes.EnemySpawned:FireClient(player, enemy)
+
+			-- Enemy movement
+			task.spawn(function()
+				self:MoveEnemy(player, enemy)
+			end)
+		end
 
 		task.wait(1) -- Spawn delay
 	end
@@ -130,6 +151,11 @@ function TowerDefenseManager:MoveEnemy(player, enemy)
 				-- Simple range check (would use actual positions in production)
 				if math.abs(tower.Position - enemy.Position) <= tower.Range then
 					enemy.Health -= tower.Damage
+
+					-- Update visual health bar
+					if enemy.Model then
+						ProceduralEnemyGenerator:UpdateHealthBar(enemy.Model, enemy.Health, enemy.MaxHealth)
+					end
 
 					tower.LastAttack = tick()
 
@@ -168,6 +194,11 @@ function TowerDefenseManager:RemoveEnemy(player, enemyId)
 
 	for i, enemy in ipairs(gameState.ActiveEnemies) do
 		if enemy.Id == enemyId then
+			-- Destroy visual model
+			if enemy.Model and enemy.Model.Parent then
+				enemy.Model:Destroy()
+			end
+
 			table.remove(gameState.ActiveEnemies, i)
 			ReplicatedStorage.Remotes.EnemyRemoved:FireClient(player, enemyId)
 			break

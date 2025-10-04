@@ -7,6 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local DataManager = require(ServerScriptService.Modules.DataManager)
+local ProceduralBuildingGenerator = require(ServerScriptService.Modules.ProceduralBuildingGenerator)
 local Config = require(ReplicatedStorage.Shared.Config)
 
 local TycoonManager = {}
@@ -89,14 +90,32 @@ function TycoonManager:SpawnBuilding(player, buildingId)
 	local basePlot = workspace:FindFirstChild(player.Name .. "_Base")
 	if not basePlot then return end
 
-	-- Create building model (simplified)
-	local building = Instance.new("Part")
+	-- Create building model using ProceduralBuildingGenerator (NO mesh IDs!)
+	local buildingPosition = basePlot.Position + buildingConfig.Offset + Vector3.new(0, 5, 0)
+	local building = ProceduralBuildingGenerator:GenerateBuilding(
+		buildingConfig.Type or "Building",
+		buildingConfig.Name,
+		buildingPosition
+	)
+
+	if not building then
+		warn("[TycoonManager] Failed to generate building:", buildingId)
+		return
+	end
+
 	building.Name = "Building_" .. buildingId
-	building.Size = Vector3.new(8, 10, 8)
-	building.Anchored = true
-	building.BrickColor = BrickColor.random()
-	building.Position = basePlot.Position + buildingConfig.Offset + Vector3.new(0, 5, 0)
 	building.Parent = basePlot
+
+	-- Generate purchase button if not owned yet
+	local playerData = DataManager:GetData(player)
+	if playerData and not table.find(playerData.UnlockedBuildings, buildingId) then
+		local button = ProceduralBuildingGenerator:GeneratePurchaseButton(
+			building,
+			buildingConfig.Cost,
+			buildingConfig.CostType or "Coins"
+		)
+		button.Parent = building
+	end
 end
 
 -- Purchase a building
