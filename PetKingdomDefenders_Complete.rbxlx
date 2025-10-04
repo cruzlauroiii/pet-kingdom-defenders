@@ -126,7 +126,7 @@
 
 		<!-- Remotes Folder -->
 		<Item class="Folder" referent="RBX10">
-	<Item class="ModuleScript" referent="RBX105FAD47CE9C4AD0A6A4D80F2011A90B">
+	<Item class="ModuleScript" referent="RBXEFB4FD6B9BBD4ED0AAB950349132362C">
 		<Properties>
 			<string name="Name">RemotesSetup</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -242,7 +242,7 @@ return remotesFolder
 
 		<!-- Shared Folder -->
 		<Item class="Folder" referent="RBX11">
-	<Item class="ModuleScript" referent="RBX93A06BDD15514FFA802FEA05F7624332">
+	<Item class="ModuleScript" referent="RBXCDA35C7A98C54572A472E8A968640D1A">
 		<Properties>
 			<string name="Name">Utils</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -448,7 +448,7 @@ return Utils
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX885EB8F232C74A8AAA9D47BCA231DB49">
+	<Item class="ModuleScript" referent="RBXEF9853592E0A430B865500732A55CDD1">
 		<Properties>
 			<string name="Name">PetData</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -714,7 +714,7 @@ return PetData
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX024B32ADD01047BDA6A7A1109EFD0891">
+	<Item class="ModuleScript" referent="RBXDB50D5479D8B4BDB89164FE20E9AC4B9">
 		<Properties>
 			<string name="Name">Config</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -1063,7 +1063,7 @@ return Config
 
 		<!-- Modules Folder -->
 		<Item class="Folder" referent="RBX20">
-	<Item class="ModuleScript" referent="RBX2A2FA473E6AA4B02B86631C4E7CF94BC">
+	<Item class="ModuleScript" referent="RBX0A802AE681AA4394820BC381EF1B98D5">
 		<Properties>
 			<string name="Name">ProceduralItemGenerator</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -1361,7 +1361,7 @@ return ProceduralItemGenerator
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX7E4763CDF147431BAE57C1322F2CDA31">
+	<Item class="ModuleScript" referent="RBX01E91198774F4DE9994419DF057503D6">
 		<Properties>
 			<string name="Name">ProceduralUIGenerator</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -1685,7 +1685,7 @@ return ProceduralUIGenerator
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBXAAF7ACD18DAE48999153AD0420DFCC41">
+	<Item class="ModuleScript" referent="RBX9DEEC485C31746D4A32D306B18A90C98">
 		<Properties>
 			<string name="Name">ProceduralTerrainGenerator</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -1905,7 +1905,7 @@ return ProceduralTerrainGenerator
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX85CC3460FA8548E98C649AB67537F585">
+	<Item class="ModuleScript" referent="RBXDE98FCC5629A4AB588619117ABA43A13">
 		<Properties>
 			<string name="Name">ProceduralEnemyGenerator</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -2226,7 +2226,7 @@ return ProceduralEnemyGenerator
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX24F0BBF3D2E048678F9F86946749DEBA">
+	<Item class="ModuleScript" referent="RBXBCD06D7CAA974C96B8558BE71F14D248">
 		<Properties>
 			<string name="Name">ProceduralBuildingGenerator</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -2558,7 +2558,7 @@ return ProceduralBuildingGenerator
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBXC75DBBEC941C44949CF263D5473C1EFE">
+	<Item class="ModuleScript" referent="RBXC5D8AEF39A0F458B9D3AD615E36931D8">
 		<Properties>
 			<string name="Name">ProceduralPetGenerator</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -2878,7 +2878,7 @@ return ProceduralPetGenerator
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX8384F8E0606F43E8B04DDB76B14DABF3">
+	<Item class="ModuleScript" referent="RBX677650C841FD401B9F1A45AD7216582B">
 		<Properties>
 			<string name="Name">EventManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -3128,7 +3128,7 @@ return EventManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX8DE90FBC5DC54D9A9E43FBE27AE4FACE">
+	<Item class="ModuleScript" referent="RBX41A94A3FA5104D08BFEFA8FB53112586">
 		<Properties>
 			<string name="Name">ObbyManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -3293,7 +3293,7 @@ return ObbyManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBXABB7C03989EF4952BE4E86489462F87E">
+	<Item class="ModuleScript" referent="RBX21689FE2EF7F406E9FFF51DBA5F784E0">
 		<Properties>
 			<string name="Name">TradingSystem</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -3603,7 +3603,7 @@ return TradingSystem
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX3F0C4D100FAB44DB99F0B77952AA1B86">
+	<Item class="ModuleScript" referent="RBXF0C30F8FA1E44A8F8788724970975DA1">
 		<Properties>
 			<string name="Name">EconomyManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -3764,7 +3764,7 @@ return EconomyManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBXE0BC9871916B47688F8E63ECBA3C4AEB">
+	<Item class="ModuleScript" referent="RBXD2885B934AF84AAD9E377E8CF6D79DC8">
 		<Properties>
 			<string name="Name">TycoonManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -3986,7 +3986,7 @@ return TycoonManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX4CD78DF5BDD84233B71A567F2D0CF696">
+	<Item class="ModuleScript" referent="RBX599F165BC160462C8C888D0F1EE6A611">
 		<Properties>
 			<string name="Name">TowerDefenseManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -4267,7 +4267,7 @@ return TowerDefenseManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX6E559DB6264B4010BEFCA42D18C31336">
+	<Item class="ModuleScript" referent="RBX2F2625C8B7C14C7BB53641E141805C44">
 		<Properties>
 			<string name="Name">PetSystem</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -4667,7 +4667,7 @@ return PetSystem
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX9688B78AADE04C788AA49BCEC3F6696F">
+	<Item class="ModuleScript" referent="RBXA1B741FA82B549ABBB7F1465A92B8CFE">
 		<Properties>
 			<string name="Name">DataManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -4951,7 +4951,7 @@ return DataManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX4DAF685BB9D2429F8EC15A998E11F3C7">
+	<Item class="ModuleScript" referent="RBX45810CB6D05B44069853F374D62A85E6">
 		<Properties>
 			<string name="Name">SecurityManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -5216,7 +5216,7 @@ return SecurityManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="Script" referent="RBXF053F917417748CDB8A6B93B453851D9">
+	<Item class="Script" referent="RBXB51631FE40B64CF1B733B068F7E3D3D1">
 		<Properties>
 			<string name="Name">MainServer</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -5329,7 +5329,7 @@ print("[Server] Pet Kingdom Defenders is running!")
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="Script" referent="RBXEA6F5AB0A43A4D848A31866E667178B7">
+	<Item class="Script" referent="RBXD170DC0FE11B415DB68E1D1DE72C9F08">
 		<Properties>
 			<string name="Name">InitializeRemotes</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -5380,7 +5380,7 @@ print("[InitializeRemotes] All remotes initialized!")
 
 			<!-- Modules Folder -->
 			<Item class="Folder" referent="RBX31">
-	<Item class="ModuleScript" referent="RBX0F973BD31A7F4B8F837CDAF948645EC6">
+	<Item class="ModuleScript" referent="RBX5A318E5FFF724EFAB267A52790E265F3">
 		<Properties>
 			<string name="Name">NotificationManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -5528,7 +5528,7 @@ return NotificationManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBXB1B0BFACB5544F81A600225202F4B9E7">
+	<Item class="ModuleScript" referent="RBX3826FAF28CCF4B688AD26A88ED562EB2">
 		<Properties>
 			<string name="Name">SoundManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -5657,7 +5657,7 @@ return SoundManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX9C2D80C196F34B34BFFAD089F784300A">
+	<Item class="ModuleScript" referent="RBXC5CE75B1E2FC4181B30D3A9DA7A6E188">
 		<Properties>
 			<string name="Name">CameraController</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -5742,7 +5742,7 @@ return CameraController
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX1FB0EDEE75414BC4BA2ECA3674808697">
+	<Item class="ModuleScript" referent="RBX7585A34C259D4854809DDB1CFF3C5754">
 		<Properties>
 			<string name="Name">InputManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -5827,7 +5827,7 @@ return InputManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBXDB3A1D51A7D24D8DA847A120A0D890BB">
+	<Item class="ModuleScript" referent="RBXE652F13995DA4D9ABEABCB8E928082C8">
 		<Properties>
 			<string name="Name">UIManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -6098,7 +6098,7 @@ return UIManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="LocalScript" referent="RBXEB71CEFDB56C4B2E91C5A64FDC078A6B">
+	<Item class="LocalScript" referent="RBX7B5CF4DD8DEC468EA4ABB1CE0567B592">
 		<Properties>
 			<string name="Name">MainClient</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -6233,7 +6233,7 @@ print("[Client] Pet Kingdom Defenders is running!")
 
 	<!-- STARTER GUI -->
 	<Item class="StarterGui" referent="RBXSTARTERGUI">
-	<Item class="LocalScript" referent="RBX0A4FB586189B4C2C95E6E23277826840">
+	<Item class="LocalScript" referent="RBX02EB375745E04D418509A7618A177804">
 		<Properties>
 			<string name="Name">MainUI</string>
 			<ProtectedString name="Source"><![CDATA[--[[
