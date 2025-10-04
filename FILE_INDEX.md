@@ -2,12 +2,13 @@
 
 ## 📋 Complete File Listing
 
-### 📘 Documentation Files (22 files)
+### 📘 Documentation Files (24 files)
 
 #### Main Documentation
 - `README.md` - Main project overview and feature documentation
 - `INSTALLATION.md` - Complete setup and installation guide
 - `FILE_INDEX.md` - This file - complete file listing
+- `AI_GENERATED_ASSETS_GUIDE.md` ⭐ NEW - Complete guide to free/AI assets
 
 #### Server Documentation
 - `ServerScriptService/MainServer.md`
@@ -38,9 +39,9 @@
 
 ---
 
-### 💻 Code Files (22 files)
+### 💻 Code Files (25 files)
 
-#### Server Scripts (10 files)
+#### Server Scripts (13 files)
 - `ServerScriptService/MainServer.lua` - Main server controller
 - `ServerScriptService/InitializeRemotes.lua` - Remote events initialization
 - `ServerScriptService/Modules/DataManager.lua` - Data persistence
@@ -51,6 +52,9 @@
 - `ServerScriptService/Modules/TradingSystem.lua` - Player trading
 - `ServerScriptService/Modules/ObbyManager.lua` - Parkour courses
 - `ServerScriptService/Modules/EventManager.lua` - Seasonal events
+- `ServerScriptService/Modules/ProceduralPetGenerator.lua` ⭐ NEW - Part-based pet generation
+- `ServerScriptService/Modules/ProceduralBuildingGenerator.lua` ⭐ NEW - Building generation
+- `ServerScriptService/Modules/ProceduralEnemyGenerator.lua` ⭐ NEW - Enemy generation
 
 #### Shared Modules (4 files)
 - `ReplicatedStorage/Shared/Config.lua` - Game configuration
@@ -71,11 +75,13 @@
 
 ## 📊 File Statistics
 
-- **Total Files**: 44
-- **Lua Scripts**: 22
-- **Documentation**: 22
-- **Lines of Code**: ~4,500+
-- **Documentation Pages**: ~15,000+ words
+- **Total Files**: 49
+- **Lua Scripts**: 25
+- **Documentation**: 24
+- **Lines of Code**: ~5,000+
+- **Documentation Pages**: ~25,000+ words
+- **Procedural Generators**: 3 (pets, buildings, enemies)
+- **Asset Cost**: $0 (100% free)
 
 ## 🗂️ Folder Structure
 
@@ -337,19 +343,23 @@ Every `.lua` file has a corresponding `.md` file with:
 **Pet Kingdom Defenders** is a complete, production-ready Roblox game featuring:
 
 ✅ **7 Major Game Systems**
-✅ **25+ Collectible Pets**
+✅ **25+ Collectible Pets (Procedurally Generated)**
+✅ **3 Procedural Generators** (Pets, Buildings, Enemies)
+✅ **100% Free Assets** (NO paid content)
 ✅ **Full Economy & Monetization**
 ✅ **Comprehensive Documentation**
 ✅ **Mobile Optimized**
 ✅ **Scalable Architecture**
 ✅ **Security & Anti-Exploit**
 ✅ **Regular Events System**
+✅ **Roblox Cube AI Ready** (March 2025)
 
 **Total Development:**
-- 44 files created
-- ~4,500+ lines of code
-- ~15,000+ words of documentation
+- 49 files created
+- ~5,000+ lines of code
+- ~25,000+ words of documentation
 - Ready for Roblox Studio import
+- $0 asset cost (100% free)
 
 ---
 

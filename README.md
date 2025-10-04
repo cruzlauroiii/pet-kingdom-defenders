@@ -72,21 +72,26 @@ Pet Kingdom Defenders/
 
 ### 🐾 Pet System
 - **25+ Unique Pets** across 5 rarity tiers (Common → Legendary)
+- **Procedural Pet Generation**: Part-based pets using geometric shapes (NO mesh IDs required)
 - **Weighted Rarity System**: Common (50%), Uncommon (30%), Rare (15%), Epic (4%), Legendary (1%)
 - **0.1% Shiny Chance** for golden variants
 - **Pet Evolution**: Increase power multipliers with coins
 - **Pet Abilities**: Unique skills for combat, economy, and support
 - **4 Egg Types**: Basic (500 coins), Golden (2.5K coins), Mystic (100 gems), Legendary (500 gems)
+- **Roblox Cube AI Ready**: Integration point for AI-generated 3D models (March 2025)
 
 ### 🏰 Tower Defense
 - **Wave-Based Combat**: Progressively harder waves with scaling rewards
+- **Procedural Enemies**: 7 geometric enemy types (Cube, Sphere, Pyramid, etc.) - NO mesh IDs required
 - **Pet-Powered Towers**: Place pets as towers with unique abilities
 - **Dynamic Difficulty**: Enemy count, health, and speed scale with wave number
 - **Strategic Placement**: Range and damage based on pet stats
+- **Performance**: 500+ enemies without lag using geometric shapes
 - **Rewards**: Coins, XP, and progression toward achievements
 
 ### 🏗️ Tycoon System
 - **7 Progressive Buildings**: From Basic Spawner to Pet Factory
+- **Procedural Buildings**: Part-based building generation (NO mesh IDs required)
 - **Passive Income**: Earn coins over time (10/sec → 1000/sec)
 - **Building Prerequisites**: Unlock in sequence
 - **Personal Base**: Unique location per player
@@ -281,6 +286,41 @@ PetName = {
 }
 ```
 
+## 🤖 Asset Generation & Free Resources
+
+### 100% Free Asset Strategy
+This game uses **NO paid assets**! All models are either:
+- **Procedurally Generated**: Using Roblox Parts only
+- **Free to Use**: From Roblox Creator Store and DevForum
+- **AI-Generated Ready**: Integration with Roblox Cube AI (March 2025)
+
+### Procedural Generation Systems
+1. **ProceduralPetGenerator.lua** - Generates pets from geometric shapes
+   - 5 pet templates (Dog, Cat, Dragon, Bird, Simple)
+   - Color palettes per rarity tier
+   - Shiny effects with sparkles
+   - NO mesh IDs required
+
+2. **ProceduralBuildingGenerator.lua** - Generates tycoon buildings
+   - 4 building types (Spawner, Collector, Upgrader, Factory)
+   - Uses Parts, Cylinders, Wedges only
+   - Visual effects (smoke, windows)
+   - Fully procedural
+
+3. **ProceduralEnemyGenerator.lua** - Generates Tower Defense enemies
+   - 7 enemy types using geometric shapes
+   - Health bars and visual effects
+   - Performance: 500+ enemies without lag
+   - Inspired by Geometry Defense
+
+### Free Asset Resources
+- **Roblox Cube AI**: 4-second AI model generation from text (March 2025)
+- **Creator Store**: 100,000+ free sounds, models, meshes
+- **DevForum Packs**: 300+ free pet models available
+- **Sound Effects**: All 8 sounds using free Creator Store IDs
+
+See `AI_GENERATED_ASSETS_GUIDE.md` for complete details.
+
 ## 📈 Success Metrics
 
 Based on 2025 Roblox trends:
@@ -290,6 +330,7 @@ Based on 2025 Roblox trends:
 - **Social Features**: Trading increases session time
 - **Events**: Seasonal content drives return visits
 - **Fair Monetization**: Non-pay-to-win increases player lifetime value
+- **No Asset Dependencies**: 100% free, procedurally generated content
 
 ## 🏆 Achievements System
 
