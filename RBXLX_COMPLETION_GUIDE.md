@@ -13,8 +13,10 @@ This guide explains how to create a complete, ready-to-open RBXLX file for Pet K
 Open PowerShell in the project directory and run:
 
 ```powershell
-.\Complete-RbxlxFile.ps1
+.\Build-CompleteRbxlx.ps1
 ```
+
+**Note:** Use the working `Build-CompleteRbxlx.ps1` script (simpler and tested).
 
 The script will:
 1. Read all 28 Lua script files

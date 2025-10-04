@@ -1,0 +1,6997 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<Meta name="ExplicitAutoJoints">true</Meta>
+	<External>null</External>
+	<External>nil</External>
+
+	<!-- Pet Kingdom Defenders - Roblox Place File -->
+	<!-- Import Instructions:
+		1. Open Roblox Studio
+		2. File → Open from File
+		3. Select this .rbxlx file
+		4. Studio will load the place structure
+		5. Manually copy Lua scripts from /src/map folders to corresponding locations
+		6. Or use Rojo/Roblox-TS for automated syncing
+	-->
+
+	<!-- WORKSPACE -->
+	<Item class="Workspace" referent="RBXWORKSPACE">
+		<Properties>
+			<string name="Name">Workspace</string>
+		</Properties>
+
+		<!-- Spawn Location -->
+		<Item class="SpawnLocation" referent="RBX01">
+			<Properties>
+				<string name="Name">SpawnLocation</string>
+				<CoordinateFrame name="CFrame">
+					<X>0</X>
+					<Y>0.5</Y>
+					<Z>0</Z>
+					<R00>1</R00>
+					<R01>0</R01>
+					<R02>0</R02>
+					<R10>0</R10>
+					<R11>1</R11>
+					<R12>0</R12>
+					<R20>0</R20>
+					<R21>0</R21>
+					<R22>1</R22>
+				</CoordinateFrame>
+				<bool name="Anchored">true</bool>
+				<Vector3 name="Size">
+					<X>6</X>
+					<Y>1</Y>
+					<Z>6</Z>
+				</Vector3>
+			</Properties>
+		</Item>
+
+		<!-- Baseplate -->
+		<Item class="Part" referent="RBX02">
+			<Properties>
+				<string name="Name">Baseplate</string>
+				<CoordinateFrame name="CFrame">
+					<X>0</X>
+					<Y>-10</Y>
+					<Z>0</Z>
+					<R00>1</R00>
+					<R01>0</R01>
+					<R02>0</R02>
+					<R10>0</R10>
+					<R11>1</R11>
+					<R12>0</R12>
+					<R20>0</R20>
+					<R21>0</R21>
+					<R22>1</R22>
+				</CoordinateFrame>
+				<bool name="Anchored">true</bool>
+				<Vector3 name="Size">
+					<X>512</X>
+					<Y>20</Y>
+					<Z>512</Z>
+				</Vector3>
+				<BrickColor name="BrickColor">28</BrickColor>
+			</Properties>
+		</Item>
+
+		<!-- Game Folders -->
+		<Item class="Folder" referent="RBX03">
+			<Properties>
+				<string name="Name">Pets</string>
+			</Properties>
+		</Item>
+
+		<Item class="Folder" referent="RBX04">
+			<Properties>
+				<string name="Name">Bases</string>
+			</Properties>
+		</Item>
+
+		<Item class="Folder" referent="RBX05">
+			<Properties>
+				<string name="Name">Enemies</string>
+			</Properties>
+		</Item>
+
+		<Item class="Folder" referent="RBX06">
+			<Properties>
+				<string name="Name">Obbies</string>
+			</Properties>
+		</Item>
+	</Item>
+
+	<!-- LIGHTING -->
+	<Item class="Lighting" referent="RBXLIGHTING">
+		<Properties>
+			<string name="Name">Lighting</string>
+			<Color3 name="Ambient">
+				<R>0.5</R>
+				<G>0.5</G>
+				<B>0.5</B>
+			</Color3>
+			<Color3 name="OutdoorAmbient">
+				<R>0.5</R>
+				<G>0.5</G>
+				<B>0.5</B>
+			</Color3>
+			<float name="Brightness">2</float>
+		</Properties>
+	</Item>
+
+	<!-- REPLICATED STORAGE -->
+	<Item class="ReplicatedStorage" referent="RBXREPLICATEDSTORAGE">
+		<Properties>
+			<string name="Name">ReplicatedStorage</string>
+		</Properties>
+
+		<!-- Remotes Folder -->
+		<Item class="Folder" referent="RBX10">
+	<Item class="ModuleScript" referent="RBXCD0341DAF2BC40AE8A2A88C126621C9D">
+		<Properties>
+			<string name="Name">RemotesSetup</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	RemotesSetup - Creates all RemoteEvents and RemoteFunctions for client-server communication
+	Run this in ServerScriptService to initialize all remotes
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Create Remotes folder
+local remotesFolder = ReplicatedStorage:FindFirstChild("Remotes")
+if not remotesFolder then
+	remotesFolder = Instance.new("Folder")
+	remotesFolder.Name = "Remotes"
+	remotesFolder.Parent = ReplicatedStorage
+end
+
+-- List of all RemoteEvents needed
+local remoteEvents = {
+	-- Pet System
+	"HatchEgg",
+	"HatchResult",
+	"EquipPet",
+	"EquipResult",
+	"UnequipPet",
+	"UnequipResult",
+	"EvolvePet",
+	"EvolveResult",
+
+	-- Currency
+	"UpdateCurrency",
+
+	-- Player Progression
+	"LevelUp",
+
+	-- Tower Defense
+	"StartWave",
+	"WaveStarted",
+	"PlaceTower",
+	"TowerPlaced",
+	"EnemySpawned",
+	"EnemyRemoved",
+	"WaveComplete",
+	"GameOver",
+
+	-- Tycoon
+	"PurchaseBuilding",
+	"PurchaseResult",
+	"CollectIncome",
+	"IncomeGenerated",
+	"IncomeCollected",
+
+	-- Trading
+	"SendTradeRequest",
+	"TradeRequest",
+	"AcceptTradeRequest",
+	"TradeAccepted",
+	"DeclineTradeRequest",
+	"TradeDeclined",
+	"AddTradeItem",
+	"RemoveTradeItem",
+	"TradeUpdated",
+	"ConfirmTrade",
+	"CancelTrade",
+	"TradeCancelled",
+	"TradeCompleted",
+	"TradeError",
+
+	-- Obby
+	"StartObby",
+	"ObbyStarted",
+	"CheckpointReached",
+	"CompleteObby",
+	"ObbyCompleted",
+	"ObbyError",
+
+	-- Events
+	"ClaimEventReward",
+	"EventStarted",
+	"EventEnded",
+	"EventRewardClaimed",
+	"EventError",
+	"SeasonChanged",
+
+	-- Economy
+	"ClaimDailyBonus",
+	"DailyBonusAvailable",
+	"DailyBonusClaimed",
+	"AchievementUnlocked"
+}
+
+-- Create all RemoteEvents
+for _, remoteName in ipairs(remoteEvents) do
+	if not remotesFolder:FindFirstChild(remoteName) then
+		local remoteEvent = Instance.new("RemoteEvent")
+		remoteEvent.Name = remoteName
+		remoteEvent.Parent = remotesFolder
+		print("[RemotesSetup] Created RemoteEvent:", remoteName)
+	end
+end
+
+print("[RemotesSetup] All remotes created successfully!")
+
+return remotesFolder
+]]></ProtectedString>
+		</Properties>
+	</Item>
+			<Properties>
+				<string name="Name">Remotes</string>
+			</Properties>
+			<!-- RemotesSetup.lua creates all 58 RemoteEvents here -->
+		</Item>
+
+		<!-- Shared Folder -->
+		<Item class="Folder" referent="RBX11">
+	<Item class="ModuleScript" referent="RBX3AD9549061B349DE99D4433B5BE20603">
+		<Properties>
+			<string name="Name">Utils</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	Utils - Utility functions used across client and server
+	Common helper functions for formatting, calculations, and more
+]]
+
+local Utils = {}
+
+-- Format large numbers with abbreviations (1000 -> 1K, 1000000 -> 1M)
+function Utils.FormatNumber(num)
+	if num < 1000 then
+		return tostring(math.floor(num))
+	elseif num < 1000000 then
+		return string.format("%.1fK", num / 1000)
+	elseif num < 1000000000 then
+		return string.format("%.1fM", num / 1000000)
+	else
+		return string.format("%.1fB", num / 1000000000)
+	end
+end
+
+-- Format time in seconds to MM:SS
+function Utils.FormatTime(seconds)
+	local mins = math.floor(seconds / 60)
+	local secs = math.floor(seconds % 60)
+	return string.format("%02d:%02d", mins, secs)
+end
+
+-- Format time with hours HH:MM:SS
+function Utils.FormatTimeHours(seconds)
+	local hours = math.floor(seconds / 3600)
+	local mins = math.floor((seconds % 3600) / 60)
+	local secs = math.floor(seconds % 60)
+	return string.format("%02d:%02d:%02d", hours, mins, secs)
+end
+
+-- Lerp between two numbers
+function Utils.Lerp(a, b, t)
+	return a + (b - a) * t
+end
+
+-- Clamp value between min and max
+function Utils.Clamp(value, min, max)
+	return math.max(min, math.min(max, value))
+end
+
+-- Get rarity color
+function Utils.GetRarityColor(rarity)
+	local colors = {
+		Common = Color3.fromRGB(155, 155, 155),
+		Uncommon = Color3.fromRGB(100, 255, 100),
+		Rare = Color3.fromRGB(100, 150, 255),
+		Epic = Color3.fromRGB(200, 100, 255),
+		Legendary = Color3.fromRGB(255, 200, 50)
+	}
+
+	return colors[rarity] or Color3.fromRGB(255, 255, 255)
+end
+
+-- Deep copy table
+function Utils.DeepCopy(original)
+	local copy = {}
+	for key, value in pairs(original) do
+		if type(value) == "table" then
+			copy[key] = Utils.DeepCopy(value)
+		else
+			copy[key] = value
+		end
+	end
+	return copy
+end
+
+-- Shuffle array
+function Utils.Shuffle(array)
+	local shuffled = Utils.DeepCopy(array)
+	for i = #shuffled, 2, -1 do
+		local j = math.random(i)
+		shuffled[i], shuffled[j] = shuffled[j], shuffled[i]
+	end
+	return shuffled
+end
+
+-- Round to decimal places
+function Utils.Round(num, decimalPlaces)
+	local mult = 10 ^ (decimalPlaces or 0)
+	return math.floor(num * mult + 0.5) / mult
+end
+
+-- Calculate distance between two Vector3 positions
+function Utils.Distance(pos1, pos2)
+	return (pos1 - pos2).Magnitude
+end
+
+-- Check if point is within radius of center
+function Utils.IsInRadius(point, center, radius)
+	return Utils.Distance(point, center) <= radius
+end
+
+-- Generate random position within bounds
+function Utils.RandomPositionInBox(min, max)
+	return Vector3.new(
+		math.random(min.X, max.X),
+		math.random(min.Y, max.Y),
+		math.random(min.Z, max.Z)
+	)
+end
+
+-- Weighted random selection
+function Utils.WeightedRandom(weights)
+	local totalWeight = 0
+	for _, weight in pairs(weights) do
+		totalWeight += weight
+	end
+
+	local random = math.random() * totalWeight
+	local currentWeight = 0
+
+	for item, weight in pairs(weights) do
+		currentWeight += weight
+		if random <= currentWeight then
+			return item
+		end
+	end
+
+	-- Fallback
+	for item, _ in pairs(weights) do
+		return item
+	end
+end
+
+-- Tween number with easing
+function Utils.EaseInOut(t)
+	return t < 0.5 and 2 * t * t or -1 + (4 - 2 * t) * t
+end
+
+-- Create billboard GUI for floating text
+function Utils.CreateFloatingText(text, position, duration, color)
+	local billboardGui = Instance.new("BillboardGui")
+	billboardGui.Size = UDim2.new(4, 0, 1, 0)
+	billboardGui.StudsOffset = Vector3.new(0, 2, 0)
+	billboardGui.AlwaysOnTop = true
+	billboardGui.Adornee = nil
+
+	local textLabel = Instance.new("TextLabel")
+	textLabel.Size = UDim2.new(1, 0, 1, 0)
+	textLabel.BackgroundTransparency = 1
+	textLabel.Text = text
+	textLabel.TextColor3 = color or Color3.fromRGB(255, 255, 255)
+	textLabel.TextScaled = true
+	textLabel.Font = Enum.Font.GothamBold
+	textLabel.Parent = billboardGui
+
+	billboardGui.Parent = workspace
+
+	-- Animate up and fade
+	local start = tick()
+	game:GetService("RunService").Heartbeat:Connect(function()
+		local elapsed = tick() - start
+		if elapsed >= duration then
+			billboardGui:Destroy()
+		else
+			local alpha = 1 - (elapsed / duration)
+			textLabel.TextTransparency = 1 - alpha
+			billboardGui.StudsOffset = Vector3.new(0, 2 + elapsed * 2, 0)
+		end
+	end)
+
+	return billboardGui
+end
+
+-- Play sound effect
+function Utils.PlaySound(soundId, volume, parent)
+	local sound = Instance.new("Sound")
+	sound.SoundId = soundId
+	sound.Volume = volume or 0.5
+	sound.Parent = parent or game.Workspace
+
+	sound:Play()
+
+	sound.Ended:Connect(function()
+		sound:Destroy()
+	end)
+
+	return sound
+end
+
+-- Vibrate mobile device (if on mobile)
+function Utils.VibrateDevice()
+	local UserInputService = game:GetService("UserInputService")
+	local HapticService = game:GetService("HapticService")
+
+	if UserInputService.TouchEnabled then
+		pcall(function()
+			HapticService:SetMotor(Enum.UserInputType.Gamepad1, Enum.VibrationMotor.Small, 0.5)
+			task.wait(0.1)
+			HapticService:SetMotor(Enum.UserInputType.Gamepad1, Enum.VibrationMotor.Small, 0)
+		end)
+	end
+end
+
+return Utils
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBXD565C58DB0B44A59890D64A94F616792">
+		<Properties>
+			<string name="Name">PetData</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	PetData - Contains all pet definitions, stats, and abilities
+	Reference for all available pets in the game
+
+	FREE PET MODELS - How to Get Them:
+
+	Option 1: FREE Pet Packs from Roblox DevForum
+	- 300+ Free Simulator Pets: devforum.roblox.com/t/300-free-simulator-pets/692024
+	- 100+ Quality Pets: devforum.roblox.com/t/100-good-quality-simulator-pets/426398
+	- 28 Pet Pack: devforum.roblox.com/t/free-pet-pack-28-pets/958670
+
+	Option 2: Roblox Toolbox (in Studio)
+	- Open Toolbox → Models → Search "pet simulator"
+	- Filter by: Free models
+	- Insert model → Get MeshId from properties
+
+	Option 3: Use Simple Parts (Current Implementation)
+	- PetSystem.lua already creates Part-based pets
+	- Works without mesh IDs
+	- Just colored spheres/balls
+
+	To Add Mesh Models:
+	1. Get model from DevForum or Toolbox
+	2. Insert into workspace
+	3. Check MeshPart → Properties → MeshId
+	4. Copy the asset ID number
+	5. Update Model fields below: "rbxassetid://YOUR_ID"
+	6. For icons: Use Roblox image editor or keep at 0
+
+	NOTE: Current game works with Part-based pets (balls)
+	Mesh IDs are OPTIONAL for enhanced visuals
+]]
+
+local PetData = {
+	-- BASIC PETS (Common/Uncommon)
+	Dog = {
+		Name = "Loyal Dog",
+		Rarity = "Common",
+		BasePower = 10,
+		BaseSpeed = 15,
+		Ability = "Fetch",
+		AbilityDescription = "Automatically collects nearby coins",
+		Model = "rbxassetid://0", -- Replace with actual model ID
+		Icon = "rbxassetid://0"
+	},
+
+	Cat = {
+		Name = "Nimble Cat",
+		Rarity = "Common",
+		BasePower = 8,
+		BaseSpeed = 20,
+		Ability = "Nine Lives",
+		AbilityDescription = "Small chance to dodge enemy attacks",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Bunny = {
+		Name = "Hopping Bunny",
+		Rarity = "Common",
+		BasePower = 6,
+		BaseSpeed = 25,
+		Ability = "Lucky Hop",
+		AbilityDescription = "Increased coin drops",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Hamster = {
+		Name = "Tiny Hamster",
+		Rarity = "Uncommon",
+		BasePower = 12,
+		BaseSpeed = 18,
+		Ability = "Hoard",
+		AbilityDescription = "Bonus passive income",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Bird = {
+		Name = "Flying Bird",
+		Rarity = "Uncommon",
+		BasePower = 14,
+		BaseSpeed = 30,
+		Ability = "Air Strike",
+		AbilityDescription = "Deal damage from above",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	-- GOLDEN PETS (Rare/Epic)
+	Lion = {
+		Name = "Mighty Lion",
+		Rarity = "Rare",
+		BasePower = 35,
+		BaseSpeed = 20,
+		Ability = "Roar",
+		AbilityDescription = "Stuns nearby enemies",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Eagle = {
+		Name = "Soaring Eagle",
+		Rarity = "Rare",
+		BasePower = 30,
+		BaseSpeed = 40,
+		Ability = "Dive Bomb",
+		AbilityDescription = "Powerful targeted attack",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Wolf = {
+		Name = "Pack Wolf",
+		Rarity = "Rare",
+		BasePower = 32,
+		BaseSpeed = 35,
+		Ability = "Pack Hunter",
+		AbilityDescription = "Stronger with other pets",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Fox = {
+		Name = "Clever Fox",
+		Rarity = "Epic",
+		BasePower = 45,
+		BaseSpeed = 38,
+		Ability = "Cunning",
+		AbilityDescription = "Double coin chance",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Bear = {
+		Name = "Grizzly Bear",
+		Rarity = "Epic",
+		BasePower = 55,
+		BaseSpeed = 25,
+		Ability = "Maul",
+		AbilityDescription = "Massive damage to single target",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	-- MYSTIC PETS (Epic/Legendary)
+	Dragon = {
+		Name = "Fire Dragon",
+		Rarity = "Epic",
+		BasePower = 70,
+		BaseSpeed = 45,
+		Ability = "Flame Breath",
+		AbilityDescription = "Area damage over time",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Phoenix = {
+		Name = "Eternal Phoenix",
+		Rarity = "Epic",
+		BasePower = 65,
+		BaseSpeed = 50,
+		Ability = "Rebirth",
+		AbilityDescription = "Revives once per wave",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Unicorn = {
+		Name = "Magical Unicorn",
+		Rarity = "Legendary",
+		BasePower = 80,
+		BaseSpeed = 55,
+		Ability = "Healing Light",
+		AbilityDescription = "Heals base over time",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Griffin = {
+		Name = "Royal Griffin",
+		Rarity = "Legendary",
+		BasePower = 85,
+		BaseSpeed = 60,
+		Ability = "Divine Shield",
+		AbilityDescription = "Protects base from damage",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Pegasus = {
+		Name = "Sky Pegasus",
+		Rarity = "Legendary",
+		BasePower = 75,
+		BaseSpeed = 70,
+		Ability = "Cloud Walk",
+		AbilityDescription = "Increases all pet speed",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	-- ULTIMATE PETS (Legendary)
+	["Celestial Dragon"] = {
+		Name = "Celestial Dragon",
+		Rarity = "Legendary",
+		BasePower = 150,
+		BaseSpeed = 80,
+		Ability = "Cosmic Fire",
+		AbilityDescription = "Massive area damage",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	["Divine Phoenix"] = {
+		Name = "Divine Phoenix",
+		Rarity = "Legendary",
+		BasePower = 140,
+		BaseSpeed = 90,
+		Ability = "Infinite Rebirth",
+		AbilityDescription = "Multiple revivals per wave",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	["Rainbow Unicorn"] = {
+		Name = "Rainbow Unicorn",
+		Rarity = "Legendary",
+		BasePower = 160,
+		BaseSpeed = 85,
+		Ability = "Rainbow Blessing",
+		AbilityDescription = "All rewards multiplied",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	["Golden Griffin"] = {
+		Name = "Golden Griffin",
+		Rarity = "Legendary",
+		BasePower = 170,
+		BaseSpeed = 95,
+		Ability = "Golden Aura",
+		AbilityDescription = "Massive coin generation",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	["Crystal Pegasus"] = {
+		Name = "Crystal Pegasus",
+		Rarity = "Legendary",
+		BasePower = 155,
+		BaseSpeed = 100,
+		Ability = "Crystal Storm",
+		AbilityDescription = "Freezes and damages all enemies",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	}
+}
+
+return PetData
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBX400CBF6599464CF7A7DB64DD0A10C7C6">
+		<Properties>
+			<string name="Name">Config</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	Config - Central configuration file for game balance and settings
+	All game constants, formulas, and configuration data
+]]
+
+local Config = {}
+
+-- Player Progression
+Config.LEVEL_EXPERIENCE_FORMULA = function(level)
+	return 100 * level * (level + 1) / 2
+end
+
+Config.MAX_EQUIPPED_PETS = 3
+
+-- Currency & Economy
+Config.STARTING_COINS = 1000
+Config.STARTING_GEMS = 50
+
+-- Eggs (Pet Hatching)
+Config.EGGS = {
+	Basic = {
+		Name = "Basic Egg",
+		Cost = 500,
+		CostType = "Coins",
+		PetPool = {"Dog", "Cat", "Bunny", "Hamster", "Bird"}
+	},
+	Golden = {
+		Name = "Golden Egg",
+		Cost = 2500,
+		CostType = "Coins",
+		PetPool = {"Lion", "Eagle", "Wolf", "Fox", "Bear"}
+	},
+	Mystic = {
+		Name = "Mystic Egg",
+		Cost = 100,
+		CostType = "Gems",
+		PetPool = {"Dragon", "Phoenix", "Unicorn", "Griffin", "Pegasus"}
+	},
+	Legendary = {
+		Name = "Legendary Egg",
+		Cost = 500,
+		CostType = "Gems",
+		PetPool = {"Celestial Dragon", "Divine Phoenix", "Rainbow Unicorn", "Golden Griffin", "Crystal Pegasus"}
+	}
+}
+
+-- Buildings (Tycoon)
+Config.BUILDINGS = {
+	Spawner1 = {
+		Name = "Basic Pet Spawner",
+		Cost = 1000,
+		IncomePerSecond = 10,
+		Prerequisites = {},
+		Offset = Vector3.new(-10, 0, -10)
+	},
+	Collector1 = {
+		Name = "Coin Collector",
+		Cost = 2500,
+		IncomePerSecond = 25,
+		Prerequisites = {"Spawner1"},
+		Offset = Vector3.new(-10, 0, 0)
+	},
+	Upgrader1 = {
+		Name = "Pet Upgrader",
+		Cost = 5000,
+		IncomePerSecond = 50,
+		Prerequisites = {"Collector1"},
+		Offset = Vector3.new(-10, 0, 10)
+	},
+	Spawner2 = {
+		Name = "Advanced Pet Spawner",
+		Cost = 10000,
+		IncomePerSecond = 100,
+		Prerequisites = {"Upgrader1"},
+		Offset = Vector3.new(0, 0, -10)
+	},
+	Collector2 = {
+		Name = "Gem Collector",
+		Cost = 25000,
+		IncomePerSecond = 200,
+		Prerequisites = {"Spawner2"},
+		Offset = Vector3.new(0, 0, 0)
+	},
+	Upgrader2 = {
+		Name = "Super Upgrader",
+		Cost = 50000,
+		IncomePerSecond = 500,
+		Prerequisites = {"Collector2"},
+		Offset = Vector3.new(0, 0, 10)
+	},
+	Factory = {
+		Name = "Pet Factory",
+		Cost = 100000,
+		IncomePerSecond = 1000,
+		Prerequisites = {"Upgrader2"},
+		Offset = Vector3.new(10, 0, 0)
+	}
+}
+
+-- Tower Defense
+Config.TD_BASE_HEALTH = 100
+Config.TD_BASE_ENEMIES = 10
+Config.TD_BASE_ENEMY_HEALTH = 50
+Config.TD_ENEMY_SPEED = 5
+Config.TD_BASE_REWARD = 50
+Config.TD_PATH_LENGTH = 100
+
+-- Obbies (Parkour Courses)
+Config.OBBIES = {
+	Easy1 = {
+		Name = "Beginner's Course",
+		RequiredLevel = 1,
+		RewardCoins = 200,
+		ExperienceReward = 50,
+		ParTime = 30,
+		Checkpoints = 5
+	},
+	Easy2 = {
+		Name = "Jumping Practice",
+		RequiredLevel = 3,
+		RewardCoins = 350,
+		ExperienceReward = 75,
+		ParTime = 45,
+		Checkpoints = 7
+	},
+	Medium1 = {
+		Name = "Speed Runner",
+		RequiredLevel = 5,
+		RewardCoins = 500,
+		ExperienceReward = 100,
+		ParTime = 60,
+		Checkpoints = 10
+	},
+	Medium2 = {
+		Name = "Precision Platformer",
+		RequiredLevel = 8,
+		RewardCoins = 750,
+		ExperienceReward = 150,
+		ParTime = 90,
+		Checkpoints = 12
+	},
+	Hard1 = {
+		Name = "Expert Challenge",
+		RequiredLevel = 12,
+		RewardCoins = 1200,
+		ExperienceReward = 250,
+		ParTime = 120,
+		Checkpoints = 15
+	},
+	Hard2 = {
+		Name = "Master Course",
+		RequiredLevel = 15,
+		RewardCoins = 2000,
+		ExperienceReward = 400,
+		ParTime = 180,
+		Checkpoints = 20
+	},
+	Extreme = {
+		Name = "Impossible Tower",
+		RequiredLevel = 20,
+		RewardCoins = 5000,
+		ExperienceReward = 1000,
+		ParTime = 300,
+		Checkpoints = 30
+	}
+}
+
+-- Trading
+Config.MAX_TRADE_ITEMS = 4
+
+-- Shop Products (DevProducts for Robux purchases)
+-- HOW TO CREATE DEVELOPER PRODUCTS:
+-- 1. Go to: create.roblox.com
+-- 2. Select your game → Monetization → Developer Products
+-- 3. Click "Create a Developer Product"
+-- 4. Upload icon (512x512 max), enter name, description
+-- 5. Set price in Robux (minimum 1, maximum 1,000,000,000)
+-- 6. Copy the Product ID from the URL or product page
+-- 7. Replace the placeholder IDs below with your real Product IDs
+--
+-- RECOMMENDED PRODUCTS (based on 2025 best practices):
+-- - Gem Packs: Best sellers, 100/500/1000 gems
+-- - Coin Packs: For players who want quick progress
+-- - Bundles: Better value, increases ARPPU
+-- - All items are consumable (can be purchased repeatedly)
+--
+-- PRICING STRATEGY (2025):
+-- - Lower prices = more purchases (1-3% conversion typical)
+-- - Bundles = 20-30% more value than individual
+-- - Never exceed ~$50 USD (~5000 Robux) per item
+-- - Fair pricing increases player lifetime value
+
+Config.SHOP_PRODUCTS = {
+	-- Replace these placeholder IDs with your actual Developer Product IDs
+	[0000000001] = { -- REPLACE with real Product ID from Creator Dashboard
+		Name = "100 Gems",
+		Type = "Gems",
+		Amount = 100,
+		Price = 100 -- Robux (approx <Item class="Folder" referent="RBX11">
+	<Item class="ModuleScript" referent="RBX3AD9549061B349DE99D4433B5BE20603">
+		<Properties>
+			<string name="Name">Utils</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	Utils - Utility functions used across client and server
+	Common helper functions for formatting, calculations, and more
+]]
+
+local Utils = {}
+
+-- Format large numbers with abbreviations (1000 -> 1K, 1000000 -> 1M)
+function Utils.FormatNumber(num)
+	if num < 1000 then
+		return tostring(math.floor(num))
+	elseif num < 1000000 then
+		return string.format("%.1fK", num / 1000)
+	elseif num < 1000000000 then
+		return string.format("%.1fM", num / 1000000)
+	else
+		return string.format("%.1fB", num / 1000000000)
+	end
+end
+
+-- Format time in seconds to MM:SS
+function Utils.FormatTime(seconds)
+	local mins = math.floor(seconds / 60)
+	local secs = math.floor(seconds % 60)
+	return string.format("%02d:%02d", mins, secs)
+end
+
+-- Format time with hours HH:MM:SS
+function Utils.FormatTimeHours(seconds)
+	local hours = math.floor(seconds / 3600)
+	local mins = math.floor((seconds % 3600) / 60)
+	local secs = math.floor(seconds % 60)
+	return string.format("%02d:%02d:%02d", hours, mins, secs)
+end
+
+-- Lerp between two numbers
+function Utils.Lerp(a, b, t)
+	return a + (b - a) * t
+end
+
+-- Clamp value between min and max
+function Utils.Clamp(value, min, max)
+	return math.max(min, math.min(max, value))
+end
+
+-- Get rarity color
+function Utils.GetRarityColor(rarity)
+	local colors = {
+		Common = Color3.fromRGB(155, 155, 155),
+		Uncommon = Color3.fromRGB(100, 255, 100),
+		Rare = Color3.fromRGB(100, 150, 255),
+		Epic = Color3.fromRGB(200, 100, 255),
+		Legendary = Color3.fromRGB(255, 200, 50)
+	}
+
+	return colors[rarity] or Color3.fromRGB(255, 255, 255)
+end
+
+-- Deep copy table
+function Utils.DeepCopy(original)
+	local copy = {}
+	for key, value in pairs(original) do
+		if type(value) == "table" then
+			copy[key] = Utils.DeepCopy(value)
+		else
+			copy[key] = value
+		end
+	end
+	return copy
+end
+
+-- Shuffle array
+function Utils.Shuffle(array)
+	local shuffled = Utils.DeepCopy(array)
+	for i = #shuffled, 2, -1 do
+		local j = math.random(i)
+		shuffled[i], shuffled[j] = shuffled[j], shuffled[i]
+	end
+	return shuffled
+end
+
+-- Round to decimal places
+function Utils.Round(num, decimalPlaces)
+	local mult = 10 ^ (decimalPlaces or 0)
+	return math.floor(num * mult + 0.5) / mult
+end
+
+-- Calculate distance between two Vector3 positions
+function Utils.Distance(pos1, pos2)
+	return (pos1 - pos2).Magnitude
+end
+
+-- Check if point is within radius of center
+function Utils.IsInRadius(point, center, radius)
+	return Utils.Distance(point, center) <= radius
+end
+
+-- Generate random position within bounds
+function Utils.RandomPositionInBox(min, max)
+	return Vector3.new(
+		math.random(min.X, max.X),
+		math.random(min.Y, max.Y),
+		math.random(min.Z, max.Z)
+	)
+end
+
+-- Weighted random selection
+function Utils.WeightedRandom(weights)
+	local totalWeight = 0
+	for _, weight in pairs(weights) do
+		totalWeight += weight
+	end
+
+	local random = math.random() * totalWeight
+	local currentWeight = 0
+
+	for item, weight in pairs(weights) do
+		currentWeight += weight
+		if random <= currentWeight then
+			return item
+		end
+	end
+
+	-- Fallback
+	for item, _ in pairs(weights) do
+		return item
+	end
+end
+
+-- Tween number with easing
+function Utils.EaseInOut(t)
+	return t < 0.5 and 2 * t * t or -1 + (4 - 2 * t) * t
+end
+
+-- Create billboard GUI for floating text
+function Utils.CreateFloatingText(text, position, duration, color)
+	local billboardGui = Instance.new("BillboardGui")
+	billboardGui.Size = UDim2.new(4, 0, 1, 0)
+	billboardGui.StudsOffset = Vector3.new(0, 2, 0)
+	billboardGui.AlwaysOnTop = true
+	billboardGui.Adornee = nil
+
+	local textLabel = Instance.new("TextLabel")
+	textLabel.Size = UDim2.new(1, 0, 1, 0)
+	textLabel.BackgroundTransparency = 1
+	textLabel.Text = text
+	textLabel.TextColor3 = color or Color3.fromRGB(255, 255, 255)
+	textLabel.TextScaled = true
+	textLabel.Font = Enum.Font.GothamBold
+	textLabel.Parent = billboardGui
+
+	billboardGui.Parent = workspace
+
+	-- Animate up and fade
+	local start = tick()
+	game:GetService("RunService").Heartbeat:Connect(function()
+		local elapsed = tick() - start
+		if elapsed >= duration then
+			billboardGui:Destroy()
+		else
+			local alpha = 1 - (elapsed / duration)
+			textLabel.TextTransparency = 1 - alpha
+			billboardGui.StudsOffset = Vector3.new(0, 2 + elapsed * 2, 0)
+		end
+	end)
+
+	return billboardGui
+end
+
+-- Play sound effect
+function Utils.PlaySound(soundId, volume, parent)
+	local sound = Instance.new("Sound")
+	sound.SoundId = soundId
+	sound.Volume = volume or 0.5
+	sound.Parent = parent or game.Workspace
+
+	sound:Play()
+
+	sound.Ended:Connect(function()
+		sound:Destroy()
+	end)
+
+	return sound
+end
+
+-- Vibrate mobile device (if on mobile)
+function Utils.VibrateDevice()
+	local UserInputService = game:GetService("UserInputService")
+	local HapticService = game:GetService("HapticService")
+
+	if UserInputService.TouchEnabled then
+		pcall(function()
+			HapticService:SetMotor(Enum.UserInputType.Gamepad1, Enum.VibrationMotor.Small, 0.5)
+			task.wait(0.1)
+			HapticService:SetMotor(Enum.UserInputType.Gamepad1, Enum.VibrationMotor.Small, 0)
+		end)
+	end
+end
+
+return Utils
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBXD565C58DB0B44A59890D64A94F616792">
+		<Properties>
+			<string name="Name">PetData</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	PetData - Contains all pet definitions, stats, and abilities
+	Reference for all available pets in the game
+
+	FREE PET MODELS - How to Get Them:
+
+	Option 1: FREE Pet Packs from Roblox DevForum
+	- 300+ Free Simulator Pets: devforum.roblox.com/t/300-free-simulator-pets/692024
+	- 100+ Quality Pets: devforum.roblox.com/t/100-good-quality-simulator-pets/426398
+	- 28 Pet Pack: devforum.roblox.com/t/free-pet-pack-28-pets/958670
+
+	Option 2: Roblox Toolbox (in Studio)
+	- Open Toolbox → Models → Search "pet simulator"
+	- Filter by: Free models
+	- Insert model → Get MeshId from properties
+
+	Option 3: Use Simple Parts (Current Implementation)
+	- PetSystem.lua already creates Part-based pets
+	- Works without mesh IDs
+	- Just colored spheres/balls
+
+	To Add Mesh Models:
+	1. Get model from DevForum or Toolbox
+	2. Insert into workspace
+	3. Check MeshPart → Properties → MeshId
+	4. Copy the asset ID number
+	5. Update Model fields below: "rbxassetid://YOUR_ID"
+	6. For icons: Use Roblox image editor or keep at 0
+
+	NOTE: Current game works with Part-based pets (balls)
+	Mesh IDs are OPTIONAL for enhanced visuals
+]]
+
+local PetData = {
+	-- BASIC PETS (Common/Uncommon)
+	Dog = {
+		Name = "Loyal Dog",
+		Rarity = "Common",
+		BasePower = 10,
+		BaseSpeed = 15,
+		Ability = "Fetch",
+		AbilityDescription = "Automatically collects nearby coins",
+		Model = "rbxassetid://0", -- Replace with actual model ID
+		Icon = "rbxassetid://0"
+	},
+
+	Cat = {
+		Name = "Nimble Cat",
+		Rarity = "Common",
+		BasePower = 8,
+		BaseSpeed = 20,
+		Ability = "Nine Lives",
+		AbilityDescription = "Small chance to dodge enemy attacks",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Bunny = {
+		Name = "Hopping Bunny",
+		Rarity = "Common",
+		BasePower = 6,
+		BaseSpeed = 25,
+		Ability = "Lucky Hop",
+		AbilityDescription = "Increased coin drops",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Hamster = {
+		Name = "Tiny Hamster",
+		Rarity = "Uncommon",
+		BasePower = 12,
+		BaseSpeed = 18,
+		Ability = "Hoard",
+		AbilityDescription = "Bonus passive income",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Bird = {
+		Name = "Flying Bird",
+		Rarity = "Uncommon",
+		BasePower = 14,
+		BaseSpeed = 30,
+		Ability = "Air Strike",
+		AbilityDescription = "Deal damage from above",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	-- GOLDEN PETS (Rare/Epic)
+	Lion = {
+		Name = "Mighty Lion",
+		Rarity = "Rare",
+		BasePower = 35,
+		BaseSpeed = 20,
+		Ability = "Roar",
+		AbilityDescription = "Stuns nearby enemies",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Eagle = {
+		Name = "Soaring Eagle",
+		Rarity = "Rare",
+		BasePower = 30,
+		BaseSpeed = 40,
+		Ability = "Dive Bomb",
+		AbilityDescription = "Powerful targeted attack",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Wolf = {
+		Name = "Pack Wolf",
+		Rarity = "Rare",
+		BasePower = 32,
+		BaseSpeed = 35,
+		Ability = "Pack Hunter",
+		AbilityDescription = "Stronger with other pets",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Fox = {
+		Name = "Clever Fox",
+		Rarity = "Epic",
+		BasePower = 45,
+		BaseSpeed = 38,
+		Ability = "Cunning",
+		AbilityDescription = "Double coin chance",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Bear = {
+		Name = "Grizzly Bear",
+		Rarity = "Epic",
+		BasePower = 55,
+		BaseSpeed = 25,
+		Ability = "Maul",
+		AbilityDescription = "Massive damage to single target",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	-- MYSTIC PETS (Epic/Legendary)
+	Dragon = {
+		Name = "Fire Dragon",
+		Rarity = "Epic",
+		BasePower = 70,
+		BaseSpeed = 45,
+		Ability = "Flame Breath",
+		AbilityDescription = "Area damage over time",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Phoenix = {
+		Name = "Eternal Phoenix",
+		Rarity = "Epic",
+		BasePower = 65,
+		BaseSpeed = 50,
+		Ability = "Rebirth",
+		AbilityDescription = "Revives once per wave",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Unicorn = {
+		Name = "Magical Unicorn",
+		Rarity = "Legendary",
+		BasePower = 80,
+		BaseSpeed = 55,
+		Ability = "Healing Light",
+		AbilityDescription = "Heals base over time",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Griffin = {
+		Name = "Royal Griffin",
+		Rarity = "Legendary",
+		BasePower = 85,
+		BaseSpeed = 60,
+		Ability = "Divine Shield",
+		AbilityDescription = "Protects base from damage",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	Pegasus = {
+		Name = "Sky Pegasus",
+		Rarity = "Legendary",
+		BasePower = 75,
+		BaseSpeed = 70,
+		Ability = "Cloud Walk",
+		AbilityDescription = "Increases all pet speed",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	-- ULTIMATE PETS (Legendary)
+	["Celestial Dragon"] = {
+		Name = "Celestial Dragon",
+		Rarity = "Legendary",
+		BasePower = 150,
+		BaseSpeed = 80,
+		Ability = "Cosmic Fire",
+		AbilityDescription = "Massive area damage",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	["Divine Phoenix"] = {
+		Name = "Divine Phoenix",
+		Rarity = "Legendary",
+		BasePower = 140,
+		BaseSpeed = 90,
+		Ability = "Infinite Rebirth",
+		AbilityDescription = "Multiple revivals per wave",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	["Rainbow Unicorn"] = {
+		Name = "Rainbow Unicorn",
+		Rarity = "Legendary",
+		BasePower = 160,
+		BaseSpeed = 85,
+		Ability = "Rainbow Blessing",
+		AbilityDescription = "All rewards multiplied",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	["Golden Griffin"] = {
+		Name = "Golden Griffin",
+		Rarity = "Legendary",
+		BasePower = 170,
+		BaseSpeed = 95,
+		Ability = "Golden Aura",
+		AbilityDescription = "Massive coin generation",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	},
+
+	["Crystal Pegasus"] = {
+		Name = "Crystal Pegasus",
+		Rarity = "Legendary",
+		BasePower = 155,
+		BaseSpeed = 100,
+		Ability = "Crystal Storm",
+		AbilityDescription = "Freezes and damages all enemies",
+		Model = "rbxassetid://0",
+		Icon = "rbxassetid://0"
+	}
+}
+
+return PetData
+]]></ProtectedString>
+		</Properties>
+	</Item> USD)
+	},
+	[0000000002] = { -- REPLACE with real Product ID
+		Name = "500 Gems",
+		Type = "Gems",
+		Amount = 500,
+		Price = 400 -- Robux (approx $4 USD) - 20% bonus value
+	},
+	[0000000003] = { -- REPLACE with real Product ID
+		Name = "1000 Gems",
+		Type = "Gems",
+		Amount = 1000,
+		Price = 700 -- Robux (approx $7 USD) - 30% bonus value
+	},
+	[0000000004] = { -- REPLACE with real Product ID
+		Name = "50,000 Coins",
+		Type = "Coins",
+		Amount = 50000,
+		Price = 200 -- Robux (approx $2 USD)
+	},
+	[0000000005] = { -- REPLACE with real Product ID
+		Name = "Starter Bundle",
+		Type = "Bundle",
+		Gems = 250,
+		Coins = 25000,
+		Price = 300 -- Robux (approx $3 USD) - Best value for new players
+	}
+}
+
+-- NOTE: EconomyManager.lua handles the ProcessReceipt callback
+-- Test purchases in Studio with "Enable Studio Access to API Services" enabled
+-- After creating DevProducts, they appear in game within ~5 minutes
+
+-- Events
+Config.EVENTS = {
+	DoubleCoins = {
+		Name = "Double Coins Weekend",
+		Type = "Weekend",
+		Multipliers = {
+			Coins = 2
+		},
+		Rewards = {}
+	},
+	SummerEvent = {
+		Name = "Summer Festival",
+		Type = "Seasonal",
+		Month = 7,
+		Multipliers = {
+			Experience = 1.5,
+			Coins = 1.25
+		},
+		Rewards = {
+			{
+				Id = "summer_pet",
+				Type = "Pet",
+				Name = "Beach Dragon",
+				RequiredProgress = 100
+			}
+		}
+	},
+	WinterEvent = {
+		Name = "Winter Wonderland",
+		Type = "Seasonal",
+		Month = 12,
+		Multipliers = {
+			PetHatchRate = 1.5,
+			Coins = 1.5
+		},
+		Rewards = {
+			{
+				Id = "winter_pet",
+				Type = "Pet",
+				Name = "Snow Phoenix",
+				RequiredProgress = 100
+			}
+		}
+	}
+}
+
+-- Achievements
+Config.ACHIEVEMENTS = {
+	FirstPet = {
+		Name = "First Friend",
+		Description = "Hatch your first pet",
+		CoinsReward = 500,
+		GemsReward = 10
+	},
+	PetCollector10 = {
+		Name = "Pet Collector",
+		Description = "Hatch 10 pets",
+		CoinsReward = 2000,
+		GemsReward = 25
+	},
+	PetCollector50 = {
+		Name = "Pet Master",
+		Description = "Hatch 50 pets",
+		CoinsReward = 10000,
+		GemsReward = 100
+	},
+	Wave10 = {
+		Name = "Defender",
+		Description = "Complete wave 10",
+		CoinsReward = 2500,
+		GemsReward = 25
+	},
+	Wave50 = {
+		Name = "Elite Defender",
+		Description = "Complete wave 50",
+		CoinsReward = 25000,
+		GemsReward = 250
+	},
+	FirstTrade = {
+		Name = "Trader",
+		Description = "Complete your first trade",
+		CoinsReward = 1000,
+		GemsReward = 20
+	},
+	ObbyMaster = {
+		Name = "Parkour Pro",
+		Description = "Complete all obbies",
+		CoinsReward = 50000,
+		GemsReward = 500
+	}
+}
+
+-- UI Settings
+Config.UI_ANIMATION_SPEED = 0.3
+Config.NOTIFICATION_DURATION = 3
+
+return Config
+]]></ProtectedString>
+		</Properties>
+	</Item>
+			<Properties>
+				<string name="Name">Shared</string>
+			</Properties>
+			<!-- Add ModuleScripts: Config.lua, PetData.lua, Utils.lua -->
+		</Item>
+	</Item>
+
+	<!-- SERVER SCRIPT SERVICE -->
+	<Item class="ServerScriptService" referent="RBXSERVERSCRIPTSERVICE">
+		<Properties>
+			<string name="Name">ServerScriptService</string>
+		</Properties>
+
+		<!-- Modules Folder -->
+		<Item class="Folder" referent="RBX20">
+	<Item class="ModuleScript" referent="RBX28D67CDBF03B499FA9FE34D9F56BE8F4">
+		<Properties>
+			<string name="Name">ProceduralItemGenerator</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	ProceduralItemGenerator - Generates loot items and collectibles
+	NO external models required - Uses procedural generation
+
+	Creates items with random stats and visual representations
+]]
+
+local ProceduralItemGenerator = {}
+
+-- Item type templates
+local ITEM_TEMPLATES = {
+	Coin = {
+		Shape = "Cylinder",
+		BaseSize = Vector3.new(1, 0.2, 1),
+		BaseColor = Color3.fromRGB(255, 215, 0), -- Gold
+		Value = 10,
+		Particle = "Sparkles"
+	},
+	Gem = {
+		Shape = "Wedge",
+		BaseSize = Vector3.new(0.8, 1.2, 0.8),
+		BaseColor = Color3.fromRGB(0, 191, 255), -- Blue
+		Value = 1,
+		Particle = "Sparkles"
+	},
+	PowerUp = {
+		Shape = "Ball",
+		BaseSize = Vector3.new(1.5, 1.5, 1.5),
+		BaseColor = Color3.fromRGB(255, 0, 255), -- Magenta
+		Duration = 30,
+		Particle = "Fire"
+	},
+	HealthPack = {
+		Shape = "Block",
+		BaseSize = Vector3.new(1, 1, 1),
+		BaseColor = Color3.fromRGB(0, 255, 0), -- Green
+		HealAmount = 50,
+		Particle = nil
+	},
+	Chest = {
+		Shape = "Block",
+		BaseSize = Vector3.new(2, 1.5, 1.5),
+		BaseColor = Color3.fromRGB(139, 69, 19), -- Brown
+		LootTable = {"Coins", "Gems", "PowerUp"},
+		Particle = "Sparkles"
+	}
+}
+
+-- Loot rarity weights
+local LOOT_RARITY = {
+	Common = 60,
+	Uncommon = 25,
+	Rare = 10,
+	Epic = 4,
+	Legendary = 1
+}
+
+-- Generate a collectible item
+function ProceduralItemGenerator:GenerateItem(itemType, position, properties)
+	itemType = itemType or "Coin"
+	position = position or Vector3.new(0, 5, 0)
+	properties = properties or {}
+
+	local template = ITEM_TEMPLATES[itemType]
+	if not template then
+		warn("[ItemGenerator] Unknown item type:", itemType)
+		return nil
+	end
+
+	-- Create item model
+	local item = Instance.new("Model")
+	item.Name = itemType
+
+	local part
+	if template.Shape == "Cylinder" then
+		part = Instance.new("Part")
+		part.Shape = Enum.PartType.Cylinder
+	elseif template.Shape == "Ball" then
+		part = Instance.new("Part")
+		part.Shape = Enum.PartType.Ball
+	elseif template.Shape == "Wedge" then
+		part = Instance.new("WedgePart")
+	else
+		part = Instance.new("Part")
+	end
+
+	part.Name = "Primary"
+	part.Size = properties.Size or template.BaseSize
+	part.Color = properties.Color or template.BaseColor
+	part.Material = Enum.Material.Neon
+	part.Anchored = true
+	part.CanCollide = false
+	part.Position = position
+	part.Parent = item
+
+	item.PrimaryPart = part
+
+	-- Add visual effects
+	if template.Particle == "Sparkles" then
+		local sparkles = Instance.new("Sparkles")
+		sparkles.Parent = part
+	elseif template.Particle == "Fire" then
+		local fire = Instance.new("Fire")
+		fire.Size = 3
+		fire.Heat = 5
+		fire.Parent = part
+	end
+
+	-- Add glow
+	local pointLight = Instance.new("PointLight")
+	pointLight.Brightness = 2
+	pointLight.Range = 10
+	pointLight.Color = part.Color
+	pointLight.Parent = part
+
+	-- Store item data as attributes
+	part:SetAttribute("ItemType", itemType)
+	part:SetAttribute("Value", template.Value)
+	if template.Duration then
+		part:SetAttribute("Duration", template.Duration)
+	end
+	if template.HealAmount then
+		part:SetAttribute("HealAmount", template.HealAmount)
+	end
+
+	-- Add floating animation
+	task.spawn(function()
+		local startHeight = position.Y
+		while item.Parent do
+			local newY = startHeight + math.sin(tick() * 2) * 0.5
+			if part.Parent then
+				part.Position = Vector3.new(position.X, newY, position.Z)
+				part.Orientation = Vector3.new(0, part.Orientation.Y + 2, 0)
+			end
+			task.wait(0.03)
+		end
+	end)
+
+	return item
+end
+
+-- Generate random loot drop
+function ProceduralItemGenerator:GenerateLootDrop(position, sourceLevel)
+	sourceLevel = sourceLevel or 1
+
+	-- Determine item type based on weighted random
+	local itemTypes = {"Coin", "Coin", "Coin", "Gem", "PowerUp", "HealthPack"}
+	local itemType = itemTypes[math.random(1, #itemTypes)]
+
+	-- Scale value based on source level
+	local properties = {}
+	if itemType == "Coin" then
+		properties.Value = 10 * sourceLevel
+	elseif itemType == "Gem" then
+		properties.Value = math.ceil(sourceLevel / 5)
+	end
+
+	return self:GenerateItem(itemType, position, properties)
+end
+
+-- Generate loot chest
+function ProceduralItemGenerator:GenerateChest(position, rarity)
+	rarity = rarity or "Common"
+
+	local chest = self:GenerateItem("Chest", position)
+
+	if not chest then return nil end
+
+	-- Add rarity-based visual modifications
+	local rarityColors = {
+		Common = Color3.fromRGB(139, 69, 19), -- Brown
+		Uncommon = Color3.fromRGB(0, 200, 0), -- Green
+		Rare = Color3.fromRGB(0, 100, 255), -- Blue
+		Epic = Color3.fromRGB(150, 0, 255), -- Purple
+		Legendary = Color3.fromRGB(255, 215, 0) -- Gold
+	}
+
+	local part = chest.PrimaryPart
+	if part then
+		-- Add accent color
+		local accent = Instance.new("Part")
+		accent.Size = Vector3.new(2.2, 0.2, 1.7)
+		accent.Position = part.Position + Vector3.new(0, 0.5, 0)
+		accent.Color = rarityColors[rarity] or rarityColors.Common
+		accent.Material = Enum.Material.Neon
+		accent.Anchored = true
+		accent.CanCollide = false
+		accent.Parent = chest
+
+		-- Store rarity
+		part:SetAttribute("Rarity", rarity)
+	end
+
+	return chest
+end
+
+-- Generate collectible coins in a pattern
+function ProceduralItemGenerator:GenerateCoinPattern(centerPosition, pattern, count)
+	pattern = pattern or "Circle"
+	count = count or 10
+
+	local coins = {}
+
+	for i = 1, count do
+		local offset
+		if pattern == "Circle" then
+			local angle = (i / count) * math.pi * 2
+			local radius = 5
+			offset = Vector3.new(math.cos(angle) * radius, 0, math.sin(angle) * radius)
+		elseif pattern == "Line" then
+			offset = Vector3.new(i * 2, 0, 0)
+		elseif pattern == "Grid" then
+			local gridSize = math.ceil(math.sqrt(count))
+			local x = (i % gridSize) * 2
+			local z = math.floor(i / gridSize) * 2
+			offset = Vector3.new(x, 0, z)
+		else
+			offset = Vector3.new(math.random(-5, 5), 0, math.random(-5, 5))
+		end
+
+		local coin = self:GenerateItem("Coin", centerPosition + offset)
+		if coin then
+			table.insert(coins, coin)
+		end
+	end
+
+	return coins
+end
+
+-- Generate power-up with random effect
+function ProceduralItemGenerator:GeneratePowerUp(position, powerType)
+	local powerTypes = {
+		Speed = {Color = Color3.fromRGB(0, 255, 255), Icon = "⚡"},
+		Damage = {Color = Color3.fromRGB(255, 0, 0), Icon = "💥"},
+		Shield = {Color = Color3.fromRGB(0, 100, 255), Icon = "🛡️"},
+		Magnet = {Color = Color3.fromRGB(255, 215, 0), Icon = "🧲"},
+		Double = {Color = Color3.fromRGB(255, 0, 255), Icon = "✨"}
+	}
+
+	powerType = powerType or ({"Speed", "Damage", "Shield", "Magnet", "Double"})[math.random(1, 5)]
+	local powerConfig = powerTypes[powerType]
+
+	local powerUp = self:GenerateItem("PowerUp", position, {
+		Color = powerConfig.Color
+	})
+
+	if powerUp and powerUp.PrimaryPart then
+		powerUp.PrimaryPart:SetAttribute("PowerType", powerType)
+		powerUp.PrimaryPart:SetAttribute("Duration", 30)
+
+		-- Add billboard with icon
+		local billboard = Instance.new("BillboardGui")
+		billboard.Size = UDim2.new(0, 50, 0, 50)
+		billboard.StudsOffset = Vector3.new(0, 2, 0)
+		billboard.Parent = powerUp.PrimaryPart
+
+		local label = Instance.new("TextLabel")
+		label.Size = UDim2.new(1, 0, 1, 0)
+		label.BackgroundTransparency = 1
+		label.Text = powerConfig.Icon
+		label.TextScaled = true
+		label.TextColor3 = Color3.fromRGB(255, 255, 255)
+		label.Parent = billboard
+	end
+
+	return powerUp
+end
+
+-- Clean up collected item with animation
+function ProceduralItemGenerator:CollectItem(item, player)
+	if not item or not item.PrimaryPart then return end
+
+	local part = item.PrimaryPart
+
+	-- Animate collection
+	local startPos = part.Position
+	local character = player.Character
+	local targetPos = character and character:FindFirstChild("HumanoidRootPart") and character.HumanoidRootPart.Position or startPos
+
+	task.spawn(function()
+		for i = 1, 10 do
+			if part.Parent then
+				part.Position = part.Position:Lerp(targetPos + Vector3.new(0, 3, 0), i / 10)
+				part.Size = part.Size * 0.9
+				task.wait(0.03)
+			end
+		end
+		item:Destroy()
+	end)
+end
+
+return ProceduralItemGenerator
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBX0C3C2947FEFF433B8D0B6EAB98FBB8F2">
+		<Properties>
+			<string name="Name">ProceduralUIGenerator</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	ProceduralUIGenerator - Generates UI sprites, icons, and visual elements
+	NO external images required - Uses Frame gradients and shapes
+
+	Creates all UI elements procedurally for zero asset dependencies
+]]
+
+local ProceduralUIGenerator = {}
+
+-- Color schemes for different UI elements
+local COLOR_SCHEMES = {
+	Currency = {
+		Coins = Color3.fromRGB(255, 215, 0), -- Gold
+		Gems = Color3.fromRGB(0, 191, 255), -- Deep Sky Blue
+	},
+	Rarity = {
+		Common = Color3.fromRGB(190, 190, 190), -- Gray
+		Uncommon = Color3.fromRGB(30, 255, 0), -- Green
+		Rare = Color3.fromRGB(0, 112, 255), -- Blue
+		Epic = Color3.fromRGB(163, 53, 238), -- Purple
+		Legendary = Color3.fromRGB(255, 128, 0), -- Orange
+	},
+	Status = {
+		Success = Color3.fromRGB(0, 255, 0), -- Green
+		Error = Color3.fromRGB(255, 0, 0), -- Red
+		Warning = Color3.fromRGB(255, 255, 0), -- Yellow
+		Info = Color3.fromRGB(0, 191, 255), -- Light Blue
+	}
+}
+
+-- Generate circular icon
+function ProceduralUIGenerator:GenerateCircleIcon(color, size)
+	size = size or UDim2.new(0, 50, 0, 50)
+
+	local icon = Instance.new("Frame")
+	icon.Size = size
+	icon.BackgroundColor3 = color
+	icon.BorderSizePixel = 0
+
+	-- Make circular using UICorner
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(1, 0) -- Full circle
+	corner.Parent = icon
+
+	-- Add gradient for depth
+	local gradient = Instance.new("UIGradient")
+	gradient.Color = ColorSequence.new{
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(1, color)
+	}
+	gradient.Rotation = 45
+	gradient.Parent = icon
+
+	return icon
+end
+
+-- Generate currency icon
+function ProceduralUIGenerator:GenerateCurrencyIcon(currencyType)
+	local color = COLOR_SCHEMES.Currency[currencyType] or Color3.fromRGB(255, 255, 255)
+	local icon = self:GenerateCircleIcon(color, UDim2.new(0, 32, 0, 32))
+
+	-- Add shine effect
+	local shine = Instance.new("Frame")
+	shine.Size = UDim2.new(0.4, 0, 0.4, 0)
+	shine.Position = UDim2.new(0.2, 0, 0.2, 0)
+	shine.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	shine.BackgroundTransparency = 0.5
+	shine.BorderSizePixel = 0
+	shine.Parent = icon
+
+	local shineCorner = Instance.new("UICorner")
+	shineCorner.CornerRadius = UDim.new(1, 0)
+	shineCorner.Parent = shine
+
+	return icon
+end
+
+-- Generate rarity border
+function ProceduralUIGenerator:GenerateRarityBorder(rarity)
+	local color = COLOR_SCHEMES.Rarity[rarity] or COLOR_SCHEMES.Rarity.Common
+
+	local border = Instance.new("UIStroke")
+	border.Color = color
+	border.Thickness = 3
+	border.Transparency = 0
+
+	-- Add glow effect for higher rarities
+	if rarity == "Epic" or rarity == "Legendary" then
+		border.Thickness = 4
+
+		-- Create glow (shadow simulation)
+		local glow = Instance.new("ImageLabel")
+		glow.Size = UDim2.new(1, 20, 1, 20)
+		glow.Position = UDim2.new(0, -10, 0, -10)
+		glow.BackgroundTransparency = 1
+		glow.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+		glow.ImageColor3 = color
+		glow.ImageTransparency = 0.7
+		glow.ScaleType = Enum.ScaleType.Slice
+		glow.SliceCenter = Rect.new(10, 10, 118, 118)
+
+		return border, glow
+	end
+
+	return border
+end
+
+-- Generate pet icon (simplified representation)
+function ProceduralUIGenerator:GeneratePetIcon(petName, rarity)
+	local container = Instance.new("Frame")
+	container.Size = UDim2.new(0, 64, 0, 64)
+	container.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+	container.BorderSizePixel = 0
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0.1, 0)
+	corner.Parent = container
+
+	-- Add rarity border
+	local border = self:GenerateRarityBorder(rarity)
+	border.Parent = container
+
+	-- Create simple shape representation
+	local shape = Instance.new("Frame")
+	shape.Size = UDim2.new(0.6, 0, 0.6, 0)
+	shape.Position = UDim2.new(0.2, 0, 0.2, 0)
+	shape.BackgroundColor3 = COLOR_SCHEMES.Rarity[rarity] or Color3.fromRGB(200, 200, 200)
+	shape.BorderSizePixel = 0
+	shape.Parent = container
+
+	-- Different shapes for different pet types
+	if petName:find("Dragon") or petName:find("Phoenix") then
+		-- Triangle (wedge approximation using rotation)
+		shape.Rotation = 0
+		local shapeCorner = Instance.new("UICorner")
+		shapeCorner.CornerRadius = UDim.new(0.2, 0)
+		shapeCorner.Parent = shape
+	elseif petName:find("Cat") or petName:find("Dog") then
+		-- Circle
+		local shapeCorner = Instance.new("UICorner")
+		shapeCorner.CornerRadius = UDim.new(1, 0)
+		shapeCorner.Parent = shape
+	else
+		-- Square
+		local shapeCorner = Instance.new("UICorner")
+		shapeCorner.CornerRadius = UDim.new(0.1, 0)
+		shapeCorner.Parent = shape
+	end
+
+	-- Add name label
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(1, 0, 0, 20)
+	label.Position = UDim2.new(0, 0, 1, -20)
+	label.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	label.BackgroundTransparency = 0.5
+	label.Text = petName
+	label.TextColor3 = Color3.fromRGB(255, 255, 255)
+	label.TextScaled = true
+	label.Font = Enum.Font.GothamBold
+	label.BorderSizePixel = 0
+	label.Parent = container
+
+	return container
+end
+
+-- Generate loading spinner
+function ProceduralUIGenerator:GenerateLoadingSpinner(size)
+	size = size or UDim2.new(0, 50, 0, 50)
+
+	local spinner = Instance.new("Frame")
+	spinner.Size = size
+	spinner.BackgroundTransparency = 1
+	spinner.BorderSizePixel = 0
+
+	-- Create rotating arc segments
+	for i = 1, 8 do
+		local segment = Instance.new("Frame")
+		segment.Size = UDim2.new(0, 6, 0.3, 0)
+		segment.Position = UDim2.new(0.5, -3, 0.1, 0)
+		segment.AnchorPoint = Vector2.new(0.5, 0)
+		segment.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		segment.BackgroundTransparency = 0.2 + (i * 0.1)
+		segment.BorderSizePixel = 0
+		segment.Rotation = (i - 1) * 45
+		segment.Parent = spinner
+
+		local corner = Instance.new("UICorner")
+		corner.CornerRadius = UDim.new(1, 0)
+		corner.Parent = segment
+	end
+
+	-- Animate rotation
+	task.spawn(function()
+		while spinner.Parent do
+			spinner.Rotation = spinner.Rotation + 10
+			task.wait(0.05)
+		end
+	end)
+
+	return spinner
+end
+
+-- Generate progress bar
+function ProceduralUIGenerator:GenerateProgressBar(current, max, color)
+	current = current or 0
+	max = max or 100
+	color = color or Color3.fromRGB(0, 255, 0)
+
+	local container = Instance.new("Frame")
+	container.Size = UDim2.new(1, 0, 0, 20)
+	container.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+	container.BorderSizePixel = 1
+	container.BorderColor3 = Color3.fromRGB(0, 0, 0)
+
+	local bar = Instance.new("Frame")
+	bar.Size = UDim2.new(current / max, 0, 1, 0)
+	bar.BackgroundColor3 = color
+	bar.BorderSizePixel = 0
+	bar.Parent = container
+
+	-- Add gradient
+	local gradient = Instance.new("UIGradient")
+	gradient.Color = ColorSequence.new{
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(1, color)
+	}
+	gradient.Rotation = 90
+	gradient.Parent = bar
+
+	-- Add text
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(1, 0, 1, 0)
+	label.BackgroundTransparency = 1
+	label.Text = string.format("%d / %d", current, max)
+	label.TextColor3 = Color3.fromRGB(255, 255, 255)
+	label.TextScaled = true
+	label.Font = Enum.Font.GothamBold
+	label.TextStrokeTransparency = 0.5
+	label.Parent = container
+
+	return container
+end
+
+-- Generate button with effects
+function ProceduralUIGenerator:GenerateButton(text, color, size)
+	text = text or "Button"
+	color = color or Color3.fromRGB(0, 170, 255)
+	size = size or UDim2.new(0, 150, 0, 50)
+
+	local button = Instance.new("TextButton")
+	button.Size = size
+	button.BackgroundColor3 = color
+	button.Text = text
+	button.TextColor3 = Color3.fromRGB(255, 255, 255)
+	button.TextScaled = true
+	button.Font = Enum.Font.GothamBold
+	button.BorderSizePixel = 0
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0.2, 0)
+	corner.Parent = button
+
+	-- Add gradient
+	local gradient = Instance.new("UIGradient")
+	gradient.Color = ColorSequence.new{
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(1, color)
+	}
+	gradient.Rotation = 90
+	gradient.Parent = button
+
+	-- Add stroke
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = Color3.fromRGB(255, 255, 255)
+	stroke.Thickness = 2
+	stroke.Transparency = 0.7
+	stroke.Parent = button
+
+	-- Hover effect
+	button.MouseEnter:Connect(function()
+		gradient.Rotation = 270
+		stroke.Transparency = 0.3
+	end)
+
+	button.MouseLeave:Connect(function()
+		gradient.Rotation = 90
+		stroke.Transparency = 0.7
+	end)
+
+	return button
+end
+
+-- Generate notification badge
+function ProceduralUIGenerator:GenerateNotificationBadge(count)
+	count = count or 1
+
+	local badge = Instance.new("Frame")
+	badge.Size = UDim2.new(0, 24, 0, 24)
+	badge.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+	badge.BorderSizePixel = 0
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(1, 0)
+	corner.Parent = badge
+
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(1, 0, 1, 0)
+	label.BackgroundTransparency = 1
+	label.Text = tostring(count)
+	label.TextColor3 = Color3.fromRGB(255, 255, 255)
+	label.TextScaled = true
+	label.Font = Enum.Font.GothamBold
+	label.Parent = badge
+
+	return badge
+end
+
+return ProceduralUIGenerator
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBX4D9DCF98FD944B34915670B673C89937">
+		<Properties>
+			<string name="Name">ProceduralTerrainGenerator</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	ProceduralTerrainGenerator - Generates game maps using Perlin noise
+	NO external assets required - Uses Roblox Terrain API
+
+	Based on 2025 best practices from Roblox DevForum
+	Generates realistic terrain procedurally for the game world
+]]
+
+local ProceduralTerrainGenerator = {}
+
+-- Terrain parameters
+local TERRAIN_SIZE = Vector3.new(512, 100, 512) -- World size
+local CHUNK_SIZE = 16 -- Process terrain in chunks for performance
+local SEED = math.random(1, 1000000) -- Random seed for unique maps
+
+-- Perlin noise implementation (simplified for Roblox)
+local function noise2D(x, z, seed)
+	-- Simple hash-based noise
+	local n = x + z * 57 + seed * 131
+	n = bit32.bxor(n, bit32.rshift(n, 13))
+	n = (n * (n * n * 15731 + 789221) + 1376312589)
+	return (bit32.band(n, 0x7fffffff) / 0x7fffffff) * 2 - 1
+end
+
+-- Octave noise for more natural terrain
+local function perlinNoise(x, z, seed, octaves, persistence)
+	local total = 0
+	local frequency = 1
+	local amplitude = 1
+	local maxValue = 0
+
+	for i = 1, octaves do
+		total = total + noise2D(x * frequency, z * frequency, seed) * amplitude
+		maxValue = maxValue + amplitude
+		amplitude = amplitude * persistence
+		frequency = frequency * 2
+	end
+
+	return total / maxValue
+end
+
+-- Generate terrain heightmap
+function ProceduralTerrainGenerator:GenerateHeightmap(sizeX, sizeZ, seed)
+	local heightmap = {}
+
+	for x = 1, sizeX do
+		heightmap[x] = {}
+		for z = 1, sizeZ do
+			-- Multi-octave Perlin noise for realistic terrain
+			local height = perlinNoise(x / 50, z / 50, seed or SEED, 4, 0.5)
+
+			-- Normalize to 0-1 range
+			height = (height + 1) / 2
+
+			-- Scale to terrain height
+			heightmap[x][z] = height * 50 -- 0-50 studs height
+		end
+	end
+
+	return heightmap
+end
+
+-- Generate full terrain using Roblox Terrain API
+function ProceduralTerrainGenerator:GenerateTerrain(options)
+	options = options or {}
+	local seed = options.Seed or SEED
+	local sizeX = options.SizeX or 256
+	local sizeZ = options.SizeZ or 256
+	local biome = options.Biome or "Grass" -- Grass, Desert, Snow, etc.
+
+	print("[TerrainGenerator] Generating terrain with seed:", seed)
+
+	-- Clear existing terrain
+	if options.ClearExisting then
+		workspace.Terrain:Clear()
+	end
+
+	-- Generate heightmap
+	local heightmap = self:GenerateHeightmap(sizeX, sizeZ, seed)
+
+	-- Material based on biome
+	local materials = {
+		Grass = {Ground = Enum.Material.Grass, Mountain = Enum.Material.Rock},
+		Desert = {Ground = Enum.Material.Sand, Mountain = Enum.Material.Sandstone},
+		Snow = {Ground = Enum.Material.Snow, Mountain = Enum.Material.Glacier},
+		Volcanic = {Ground = Enum.Material.Basalt, Mountain = Enum.Material.CrackedLava}
+	}
+
+	local biomeMaterials = materials[biome] or materials.Grass
+
+	-- Fill terrain in chunks for performance
+	for chunkX = 0, math.floor(sizeX / CHUNK_SIZE) do
+		for chunkZ = 0, math.floor(sizeZ / CHUNK_SIZE) do
+
+			local region = Region3.new(
+				Vector3.new(chunkX * CHUNK_SIZE - sizeX/2, 0, chunkZ * CHUNK_SIZE - sizeZ/2),
+				Vector3.new((chunkX + 1) * CHUNK_SIZE - sizeX/2, 100, (chunkZ + 1) * CHUNK_SIZE - sizeZ/2)
+			):ExpandToGrid(4)
+
+			local size = region.Size
+			local materials = table.create(size.X * size.Y * size.Z)
+			local occupancies = table.create(size.X * size.Y * size.Z)
+
+			local index = 1
+			for x = 1, size.X do
+				for y = 1, size.Y do
+					for z = 1, size.Z do
+						local worldX = chunkX * CHUNK_SIZE + x
+						local worldZ = chunkZ * CHUNK_SIZE + z
+
+						if worldX <= sizeX and worldZ <= sizeZ then
+							local height = heightmap[worldX][worldZ]
+							local worldY = y
+
+							if worldY <= height then
+								-- Choose material based on height
+								if height > 35 then
+									materials[index] = biomeMaterials.Mountain
+								else
+									materials[index] = biomeMaterials.Ground
+								end
+								occupancies[index] = 1
+							else
+								materials[index] = Enum.Material.Air
+								occupancies[index] = 0
+							end
+						else
+							materials[index] = Enum.Material.Air
+							occupancies[index] = 0
+						end
+
+						index = index + 1
+					end
+				end
+			end
+
+			workspace.Terrain:WriteVoxels(region, 4, materials, occupancies)
+
+			-- Yield to prevent timeout
+			if (chunkX + chunkZ) % 4 == 0 then
+				task.wait()
+			end
+		end
+	end
+
+	print("[TerrainGenerator] Terrain generation complete!")
+	return true
+end
+
+-- Generate simple flat arena for Tower Defense
+function ProceduralTerrainGenerator:GenerateArena(radius)
+	radius = radius or 100
+
+	print("[TerrainGenerator] Generating TD Arena...")
+
+	-- Create flat circular arena
+	local region = Region3.new(
+		Vector3.new(-radius, -10, -radius),
+		Vector3.new(radius, 5, radius)
+	):ExpandToGrid(4)
+
+	local size = region.Size
+	local materials = table.create(size.X * size.Y * size.Z)
+	local occupancies = table.create(size.X * size.Y * size.Z)
+
+	local index = 1
+	local center = Vector3.new(0, 0, 0)
+
+	for x = 1, size.X do
+		for y = 1, size.Y do
+			for z = 1, size.Z do
+				local worldPos = region.CFrame.Position + Vector3.new(x - size.X/2, y - size.Y/2, z - size.Z/2) * 4
+				local distance = (Vector2.new(worldPos.X, worldPos.Z) - Vector2.new(center.X, center.Z)).Magnitude
+
+				-- Create circular arena
+				if distance <= radius and y <= 2 then
+					materials[index] = Enum.Material.Concrete
+					occupancies[index] = 1
+				else
+					materials[index] = Enum.Material.Air
+					occupancies[index] = 0
+				end
+
+				index = index + 1
+			end
+		end
+	end
+
+	workspace.Terrain:WriteVoxels(region, 4, materials, occupancies)
+
+	print("[TerrainGenerator] Arena generation complete!")
+	return true
+end
+
+-- Generate spawn platform
+function ProceduralTerrainGenerator:GenerateSpawnPlatform(position, size)
+	position = position or Vector3.new(0, 0, 0)
+	size = size or Vector3.new(50, 5, 50)
+
+	local region = Region3.new(
+		position - size/2,
+		position + size/2
+	):ExpandToGrid(4)
+
+	workspace.Terrain:FillBlock(
+		region.CFrame,
+		region.Size,
+		Enum.Material.Grass
+	)
+
+	return true
+end
+
+return ProceduralTerrainGenerator
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBXD82C18D8620746138BABB4B90418002B">
+		<Properties>
+			<string name="Name">ProceduralEnemyGenerator</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	ProceduralEnemyGenerator - Generates Tower Defense enemies using geometric shapes
+	NO MESH IDS REQUIRED - Inspired by popular games like Geometry Defense
+
+	Uses simple geometric shapes for performant, unique enemies
+	Can handle 500+ enemies without lag
+]]
+
+local ProceduralEnemyGenerator = {}
+
+-- Enemy templates using geometric shapes
+local ENEMY_TEMPLATES = {
+	-- Basic geometric enemies
+	Cube = {
+		Shape = "Block",
+		Size = Vector3.new(2, 2, 2),
+		Color = Color3.fromRGB(255, 100, 100),
+		Health = 50,
+		Speed = 8,
+		Reward = 10
+	},
+
+	Sphere = {
+		Shape = "Ball",
+		Size = Vector3.new(2, 2, 2),
+		Color = Color3.fromRGB(100, 100, 255),
+		Health = 75,
+		Speed = 10,
+		Reward = 15
+	},
+
+	Pyramid = {
+		Shape = "Wedge",
+		Size = Vector3.new(2.5, 2.5, 2.5),
+		Color = Color3.fromRGB(255, 200, 50),
+		Health = 100,
+		Speed = 6,
+		Reward = 20
+	},
+
+	Cylinder = {
+		Shape = "Cylinder",
+		Size = Vector3.new(2, 3, 2),
+		Color = Color3.fromRGB(150, 255, 150),
+		Health = 60,
+		Speed = 12,
+		Reward = 12
+	},
+
+	-- Advanced geometric enemies
+	Octahedron = {
+		-- Two pyramids joined (approximation using wedges)
+		Parts = {
+			{Shape = "Wedge", Size = Vector3.new(2, 2, 2), Offset = Vector3.new(0, 1, 0)},
+			{Shape = "Wedge", Size = Vector3.new(2, 2, 2), Offset = Vector3.new(0, -1, 0), Rotation = 180}
+		},
+		Color = Color3.fromRGB(255, 100, 255),
+		Health = 150,
+		Speed = 7,
+		Reward = 30
+	},
+
+	Hexagon = {
+		-- Six-sided shape using blocks
+		Parts = {
+			{Shape = "Block", Size = Vector3.new(2, 2, 0.5), Offset = Vector3.new(0, 0, 0)},
+			{Shape = "Block", Size = Vector3.new(0.5, 2, 2), Offset = Vector3.new(0, 0, 0)}
+		},
+		Color = Color3.fromRGB(100, 255, 255),
+		Health = 120,
+		Speed = 9,
+		Reward = 25
+	},
+
+	Boss = {
+		-- Large complex enemy
+		Parts = {
+			{Shape = "Ball", Size = Vector3.new(4, 4, 4), Offset = Vector3.new(0, 0, 0)},
+			{Shape = "Cylinder", Size = Vector3.new(1, 3, 1), Offset = Vector3.new(0, 3, 0)},
+			{Shape = "Block", Size = Vector3.new(2, 0.5, 0.5), Offset = Vector3.new(0, 4.5, 0)}
+		},
+		Color = Color3.fromRGB(150, 0, 150),
+		Health = 500,
+		Speed = 5,
+		Reward = 100
+	}
+}
+
+-- Color variations for different wave difficulties
+local DIFFICULTY_COLORS = {
+	Easy = Color3.fromRGB(100, 200, 100),
+	Medium = Color3.fromRGB(200, 200, 100),
+	Hard = Color3.fromRGB(200, 100, 100),
+	Boss = Color3.fromRGB(150, 0, 150)
+}
+
+-- Create a basic part
+local function createPart(shape, size, color)
+	local part
+
+	if shape == "Ball" then
+		part = Instance.new("Part")
+		part.Shape = Enum.PartType.Ball
+	elseif shape == "Cylinder" then
+		part = Instance.new("Part")
+		part.Shape = Enum.PartType.Cylinder
+	elseif shape == "Wedge" then
+		part = Instance.new("WedgePart")
+	else
+		part = Instance.new("Part")
+	end
+
+	part.Size = size
+	part.Color = color
+	part.TopSurface = Enum.SurfaceType.Smooth
+	part.BottomSurface = Enum.SurfaceType.Smooth
+	part.Material = Enum.Material.Neon -- Glowing effect
+	part.Anchored = false
+	part.CanCollide = false
+
+	return part
+end
+
+-- Generate an enemy from template
+function ProceduralEnemyGenerator:GenerateEnemy(enemyType, waveNumber, difficulty)
+	local template = ENEMY_TEMPLATES[enemyType] or ENEMY_TEMPLATES.Cube
+
+	-- Scale stats with wave number
+	local healthMultiplier = 1 + (waveNumber * 0.1)
+	local speedMultiplier = 1 + (waveNumber * 0.05)
+	local rewardMultiplier = 1 + (waveNumber * 0.1)
+
+	-- Adjust color based on difficulty
+	local baseColor = template.Color
+	if difficulty then
+		baseColor = DIFFICULTY_COLORS[difficulty] or baseColor
+	end
+
+	-- Create model
+	local model = Instance.new("Model")
+	model.Name = enemyType
+
+	local parts = {}
+
+	-- Simple enemy (single part)
+	if template.Shape then
+		local mainPart = createPart(template.Shape, template.Size, baseColor)
+		mainPart.Name = "HumanoidRootPart" -- For compatibility
+		mainPart.Parent = model
+		table.insert(parts, mainPart)
+
+		-- Add health bar
+		local healthBar = Instance.new("BillboardGui")
+		healthBar.Name = "HealthBar"
+		healthBar.Size = UDim2.new(0, 50, 0, 5)
+		healthBar.StudsOffset = Vector3.new(0, 3, 0)
+		healthBar.Parent = mainPart
+
+		local bar = Instance.new("Frame")
+		bar.Size = UDim2.new(1, 0, 1, 0)
+		bar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+		bar.BorderSizePixel = 0
+		bar.Parent = healthBar
+	end
+
+	-- Complex enemy (multiple parts)
+	if template.Parts then
+		local mainPart = nil
+
+		for i, partData in ipairs(template.Parts) do
+			local part = createPart(partData.Shape, partData.Size, baseColor)
+			part.Name = i == 1 and "HumanoidRootPart" or "Part" .. i
+			part.Position = partData.Offset or Vector3.new(0, 0, 0)
+
+			if partData.Rotation then
+				part.Orientation = Vector3.new(partData.Rotation, 0, 0)
+			end
+
+			part.Parent = model
+			table.insert(parts, part)
+
+			if i == 1 then
+				mainPart = part
+
+				-- Add health bar to main part
+				local healthBar = Instance.new("BillboardGui")
+				healthBar.Name = "HealthBar"
+				healthBar.Size = UDim2.new(0, 60, 0, 6)
+				healthBar.StudsOffset = Vector3.new(0, 4, 0)
+				healthBar.Parent = mainPart
+
+				local bar = Instance.new("Frame")
+				bar.Size = UDim2.new(1, 0, 1, 0)
+				bar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+				bar.BorderSizePixel = 0
+				bar.Parent = healthBar
+			end
+		end
+
+		-- Weld parts together
+		for _, part in ipairs(parts) do
+			if part ~= mainPart then
+				local weld = Instance.new("WeldConstraint")
+				weld.Part0 = mainPart
+				weld.Part1 = part
+				weld.Parent = mainPart
+			end
+		end
+	end
+
+	-- Set primary part
+	model.PrimaryPart = model:FindFirstChild("HumanoidRootPart")
+
+	-- Store enemy stats in attributes (for Tower Defense system)
+	if model.PrimaryPart then
+		model.PrimaryPart:SetAttribute("Health", math.floor(template.Health * healthMultiplier))
+		model.PrimaryPart:SetAttribute("MaxHealth", math.floor(template.Health * healthMultiplier))
+		model.PrimaryPart:SetAttribute("Speed", template.Speed * speedMultiplier)
+		model.PrimaryPart:SetAttribute("Reward", math.floor(template.Reward * rewardMultiplier))
+		model.PrimaryPart:SetAttribute("EnemyType", enemyType)
+	end
+
+	-- Add floating effect
+	if model.PrimaryPart then
+		local bodyPosition = Instance.new("BodyPosition")
+		bodyPosition.MaxForce = Vector3.new(0, 50000, 0)
+		bodyPosition.Position = model.PrimaryPart.Position + Vector3.new(0, math.sin(tick()) * 0.5, 0)
+		bodyPosition.Parent = model.PrimaryPart
+
+		-- Rotate enemy for visual effect
+		local bodyGyro = Instance.new("BodyGyro")
+		bodyGyro.MaxTorque = Vector3.new(0, 50000, 0)
+		bodyGyro.CFrame = model.PrimaryPart.CFrame
+		bodyGyro.Parent = model.PrimaryPart
+
+		-- Spin animation
+		task.spawn(function()
+			while model.Parent do
+				if bodyGyro then
+					bodyGyro.CFrame = bodyGyro.CFrame * CFrame.Angles(0, math.rad(2), 0)
+				end
+				task.wait(0.03)
+			end
+		end)
+	end
+
+	return model
+end
+
+-- Generate a wave of enemies
+function ProceduralEnemyGenerator:GenerateWave(waveNumber)
+	local enemies = {}
+	local enemyCount = 5 + (waveNumber * 2) -- Scale with wave
+
+	-- Determine difficulty
+	local difficulty = "Easy"
+	if waveNumber >= 10 then
+		difficulty = "Hard"
+	elseif waveNumber >= 5 then
+		difficulty = "Medium"
+	end
+
+	-- Select enemy types for this wave
+	local enemyTypes = {"Cube", "Sphere", "Pyramid", "Cylinder"}
+
+	-- Add advanced enemies on higher waves
+	if waveNumber >= 3 then
+		table.insert(enemyTypes, "Hexagon")
+	end
+	if waveNumber >= 5 then
+		table.insert(enemyTypes, "Octahedron")
+	end
+
+	-- Generate enemies
+	for i = 1, enemyCount do
+		local enemyType = enemyTypes[math.random(1, #enemyTypes)]
+		local enemy = self:GenerateEnemy(enemyType, waveNumber, difficulty)
+		table.insert(enemies, enemy)
+	end
+
+	-- Add boss every 10 waves
+	if waveNumber % 10 == 0 then
+		local boss = self:GenerateEnemy("Boss", waveNumber, "Boss")
+		table.insert(enemies, boss)
+	end
+
+	return enemies
+end
+
+-- Update health bar visual
+function ProceduralEnemyGenerator:UpdateHealthBar(enemy, currentHealth, maxHealth)
+	local primaryPart = enemy.PrimaryPart
+	if not primaryPart then return end
+
+	local healthBar = primaryPart:FindFirstChild("HealthBar")
+	if not healthBar then return end
+
+	local bar = healthBar:FindFirstChild("Frame")
+	if not bar then return end
+
+	-- Update bar size based on health percentage
+	local healthPercent = currentHealth / maxHealth
+	bar.Size = UDim2.new(healthPercent, 0, 1, 0)
+
+	-- Change color based on health
+	if healthPercent > 0.6 then
+		bar.BackgroundColor3 = Color3.fromRGB(0, 255, 0) -- Green
+	elseif healthPercent > 0.3 then
+		bar.BackgroundColor3 = Color3.fromRGB(255, 255, 0) -- Yellow
+	else
+		bar.BackgroundColor3 = Color3.fromRGB(255, 0, 0) -- Red
+	end
+end
+
+return ProceduralEnemyGenerator
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBX1EBFE3C3A67C46659957C831968EA12A">
+		<Properties>
+			<string name="Name">ProceduralBuildingGenerator</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	ProceduralBuildingGenerator - Generates tycoon buildings using only Roblox Parts
+	NO MESH IDS REQUIRED - Fully procedural and performant
+
+	Creates unique buildings for the tycoon system using geometric shapes
+]]
+
+local ProceduralBuildingGenerator = {}
+
+-- Building templates for different types
+local BUILDING_TEMPLATES = {
+	-- Pet Spawners
+	Spawner = {
+		Base = {Size = Vector3.new(8, 1, 8), Position = Vector3.new(0, 0.5, 0), Color = Color3.fromRGB(100, 100, 100)},
+		Pillar = {Size = Vector3.new(1, 6, 1), Positions = {
+			Vector3.new(-3, 3, -3),
+			Vector3.new(3, 3, -3),
+			Vector3.new(-3, 3, 3),
+			Vector3.new(3, 3, 3)
+		}, Color = Color3.fromRGB(150, 150, 150)},
+		Roof = {Size = Vector3.new(10, 0.5, 10), Position = Vector3.new(0, 7, 0), Color = Color3.fromRGB(180, 100, 50)},
+		SpawnPoint = {Size = Vector3.new(4, 0.5, 4), Position = Vector3.new(0, 1.5, 0), Color = Color3.fromRGB(100, 200, 100)}
+	},
+
+	-- Collectors
+	Collector = {
+		Base = {Size = Vector3.new(6, 1, 6), Position = Vector3.new(0, 0.5, 0), Color = Color3.fromRGB(80, 80, 120)},
+		Tank = {Size = Vector3.new(4, 5, 4), Position = Vector3.new(0, 3, 0), Shape = "Cylinder", Color = Color3.fromRGB(100, 150, 200)},
+		Pipe = {Size = Vector3.new(0.5, 3, 0.5), Position = Vector3.new(2, 5, 0), Shape = "Cylinder", Color = Color3.fromRGB(120, 120, 120)},
+		Funnel = {Size = Vector3.new(3, 1, 3), Position = Vector3.new(0, 6, 0), Color = Color3.fromRGB(150, 180, 220)}
+	},
+
+	-- Upgraders
+	Upgrader = {
+		Base = {Size = Vector3.new(7, 1, 7), Position = Vector3.new(0, 0.5, 0), Color = Color3.fromRGB(120, 80, 150)},
+		Conveyor = {Size = Vector3.new(6, 0.5, 3), Position = Vector3.new(0, 1.5, 0), Color = Color3.fromRGB(60, 60, 60)},
+		Gears = {
+			{Size = Vector3.new(1.5, 0.3, 1.5), Position = Vector3.new(-2, 2.5, 0), Shape = "Cylinder"},
+			{Size = Vector3.new(1.5, 0.3, 1.5), Position = Vector3.new(0, 2.5, 0), Shape = "Cylinder"},
+			{Size = Vector3.new(1.5, 0.3, 1.5), Position = Vector3.new(2, 2.5, 0), Shape = "Cylinder"}
+		},
+		Housing = {Size = Vector3.new(7, 3, 4), Position = Vector3.new(0, 3, 0), Color = Color3.fromRGB(150, 100, 180)}
+	},
+
+	-- Factory
+	Factory = {
+		Base = {Size = Vector3.new(12, 1, 12), Position = Vector3.new(0, 0.5, 0), Color = Color3.fromRGB(100, 100, 100)},
+		MainBuilding = {Size = Vector3.new(10, 8, 10), Position = Vector3.new(0, 4.5, 0), Color = Color3.fromRGB(140, 140, 140)},
+		Chimney = {Size = Vector3.new(2, 6, 2), Position = Vector3.new(4, 10, 4), Shape = "Cylinder", Color = Color3.fromRGB(80, 80, 80)},
+		Door = {Size = Vector3.new(3, 4, 0.5), Position = Vector3.new(0, 2.5, 5.5), Color = Color3.fromRGB(100, 50, 20)},
+		Windows = {
+			{Size = Vector3.new(2, 2, 0.2), Position = Vector3.new(-3, 6, 5.2)},
+			{Size = Vector3.new(2, 2, 0.2), Position = Vector3.new(3, 6, 5.2)}
+		}
+	}
+}
+
+-- Helper function to create a part
+local function createPart(size, position, color, shape)
+	local part = Instance.new("Part")
+
+	if shape == "Cylinder" then
+		part.Shape = Enum.PartType.Cylinder
+	elseif shape == "Ball" then
+		part.Shape = Enum.PartType.Ball
+	end
+
+	part.Size = size
+	part.Position = position
+	part.Color = color or Color3.fromRGB(200, 200, 200)
+	part.Anchored = true
+	part.TopSurface = Enum.SurfaceType.Smooth
+	part.BottomSurface = Enum.SurfaceType.Smooth
+	part.Material = Enum.Material.SmoothPlastic
+
+	return part
+end
+
+-- Generate a building from template
+function ProceduralBuildingGenerator:GenerateBuilding(buildingType, buildingName, position)
+	local template = BUILDING_TEMPLATES.Spawner -- Default
+
+	-- Select template based on building name
+	if buildingName:find("Spawner") then
+		template = BUILDING_TEMPLATES.Spawner
+	elseif buildingName:find("Collector") then
+		template = BUILDING_TEMPLATES.Collector
+	elseif buildingName:find("Upgrader") then
+		template = BUILDING_TEMPLATES.Upgrader
+	elseif buildingName:find("Factory") then
+		template = BUILDING_TEMPLATES.Factory
+	end
+
+	-- Create model container
+	local model = Instance.new("Model")
+	model.Name = buildingName
+
+	local parts = {}
+	local basePosition = position or Vector3.new(0, 0, 0)
+
+	-- Create base
+	if template.Base then
+		local base = createPart(
+			template.Base.Size,
+			basePosition + template.Base.Position,
+			template.Base.Color
+		)
+		base.Name = "Base"
+		base.Parent = model
+		table.insert(parts, base)
+	end
+
+	-- Create pillars (if exists)
+	if template.Pillar then
+		for i, pillarPos in ipairs(template.Pillar.Positions) do
+			local pillar = createPart(
+				template.Pillar.Size,
+				basePosition + pillarPos,
+				template.Pillar.Color
+			)
+			pillar.Name = "Pillar" .. i
+			pillar.Parent = model
+			table.insert(parts, pillar)
+		end
+	end
+
+	-- Create roof (if exists)
+	if template.Roof then
+		local roof = createPart(
+			template.Roof.Size,
+			basePosition + template.Roof.Position,
+			template.Roof.Color
+		)
+		roof.Name = "Roof"
+		roof.Parent = model
+		table.insert(parts, roof)
+	end
+
+	-- Create spawn point (spawners)
+	if template.SpawnPoint then
+		local spawnPoint = createPart(
+			template.SpawnPoint.Size,
+			basePosition + template.SpawnPoint.Position,
+			template.SpawnPoint.Color
+		)
+		spawnPoint.Name = "SpawnPoint"
+		spawnPoint.Transparency = 0.5
+		spawnPoint.Parent = model
+		table.insert(parts, spawnPoint)
+	end
+
+	-- Create tank (collectors)
+	if template.Tank then
+		local tank = createPart(
+			template.Tank.Size,
+			basePosition + template.Tank.Position,
+			template.Tank.Color,
+			template.Tank.Shape
+		)
+		tank.Name = "Tank"
+		tank.Parent = model
+		table.insert(parts, tank)
+	end
+
+	-- Create pipe (collectors)
+	if template.Pipe then
+		local pipe = createPart(
+			template.Pipe.Size,
+			basePosition + template.Pipe.Position,
+			template.Pipe.Color,
+			template.Pipe.Shape
+		)
+		pipe.Name = "Pipe"
+		pipe.Parent = model
+		table.insert(parts, pipe)
+	end
+
+	-- Create funnel (collectors)
+	if template.Funnel then
+		local funnel = createPart(
+			template.Funnel.Size,
+			basePosition + template.Funnel.Position,
+			template.Funnel.Color
+		)
+		funnel.Name = "Funnel"
+		funnel.Parent = model
+		table.insert(parts, funnel)
+	end
+
+	-- Create conveyor (upgraders)
+	if template.Conveyor then
+		local conveyor = createPart(
+			template.Conveyor.Size,
+			basePosition + template.Conveyor.Position,
+			template.Conveyor.Color
+		)
+		conveyor.Name = "Conveyor"
+		conveyor.Parent = model
+		table.insert(parts, conveyor)
+	end
+
+	-- Create gears (upgraders)
+	if template.Gears then
+		for i, gearData in ipairs(template.Gears) do
+			local gear = createPart(
+				gearData.Size,
+				basePosition + gearData.Position,
+				Color3.fromRGB(200, 150, 50),
+				gearData.Shape
+			)
+			gear.Name = "Gear" .. i
+			gear.Parent = model
+			table.insert(parts, gear)
+		end
+	end
+
+	-- Create housing (upgraders)
+	if template.Housing then
+		local housing = createPart(
+			template.Housing.Size,
+			basePosition + template.Housing.Position,
+			template.Housing.Color
+		)
+		housing.Name = "Housing"
+		housing.Transparency = 0.3
+		housing.Parent = model
+		table.insert(parts, housing)
+	end
+
+	-- Create main building (factory)
+	if template.MainBuilding then
+		local mainBuilding = createPart(
+			template.MainBuilding.Size,
+			basePosition + template.MainBuilding.Position,
+			template.MainBuilding.Color
+		)
+		mainBuilding.Name = "MainBuilding"
+		mainBuilding.Parent = model
+		table.insert(parts, mainBuilding)
+	end
+
+	-- Create chimney (factory)
+	if template.Chimney then
+		local chimney = createPart(
+			template.Chimney.Size,
+			basePosition + template.Chimney.Position,
+			template.Chimney.Color,
+			template.Chimney.Shape
+		)
+		chimney.Name = "Chimney"
+		chimney.Parent = model
+		table.insert(parts, chimney)
+
+		-- Add smoke effect
+		local smoke = Instance.new("Smoke")
+		smoke.Parent = chimney
+	end
+
+	-- Create door (factory)
+	if template.Door then
+		local door = createPart(
+			template.Door.Size,
+			basePosition + template.Door.Position,
+			template.Door.Color
+		)
+		door.Name = "Door"
+		door.Parent = model
+		table.insert(parts, door)
+	end
+
+	-- Create windows (factory)
+	if template.Windows then
+		for i, windowData in ipairs(template.Windows) do
+			local window = createPart(
+				windowData.Size,
+				basePosition + windowData.Position,
+				Color3.fromRGB(150, 200, 255)
+			)
+			window.Name = "Window" .. i
+			window.Transparency = 0.5
+			window.Parent = model
+			table.insert(parts, window)
+		end
+	end
+
+	-- Set primary part
+	model.PrimaryPart = model:FindFirstChild("Base") or parts[1]
+
+	return model
+end
+
+-- Generate a purchase button for the building
+function ProceduralBuildingGenerator:GeneratePurchaseButton(building, cost, costType)
+	local button = Instance.new("Part")
+	button.Name = "PurchaseButton"
+	button.Size = Vector3.new(4, 1, 4)
+	button.Color = Color3.fromRGB(100, 200, 100)
+	button.Material = Enum.Material.Neon
+	button.Anchored = true
+	button.CanCollide = false
+
+	-- Position button in front of building
+	if building.PrimaryPart then
+		button.Position = building.PrimaryPart.Position + Vector3.new(0, 2, 8)
+	end
+
+	-- Add text label above button
+	local billboardGui = Instance.new("BillboardGui")
+	billboardGui.Size = UDim2.new(0, 200, 0, 100)
+	billboardGui.StudsOffset = Vector3.new(0, 3, 0)
+	billboardGui.Parent = button
+
+	local textLabel = Instance.new("TextLabel")
+	textLabel.Size = UDim2.new(1, 0, 1, 0)
+	textLabel.BackgroundTransparency = 1
+	textLabel.Text = string.format("💰 %d %s", cost, costType)
+	textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	textLabel.TextScaled = true
+	textLabel.Font = Enum.Font.GothamBold
+	textLabel.Parent = billboardGui
+
+	button.Parent = building
+	return button
+end
+
+return ProceduralBuildingGenerator
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBX6F48F8B7BB1D4136974F3948C11B808B">
+		<Properties>
+			<string name="Name">ProceduralPetGenerator</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	ProceduralPetGenerator - Generates pets using only Roblox Parts
+	NO MESH IDS REQUIRED - Fully procedural, free, and performant
+
+	Uses geometric shapes and procedural generation to create unique pets
+	Each pet is generated from combinations of Parts, colors, and patterns
+]]
+
+local ProceduralPetGenerator = {}
+
+-- Pet shape templates using only basic Parts
+local PET_TEMPLATES = {
+	-- Dog-like creature
+	Dog = {
+		Body = {Type = "Ball", Scale = Vector3.new(2, 1.5, 2.5)},
+		Head = {Type = "Ball", Scale = Vector3.new(1.2, 1.2, 1.2), Offset = Vector3.new(0, 0.5, 1.5)},
+		Ears = {
+			{Type = "Cylinder", Scale = Vector3.new(0.3, 0.8, 0.3), Offset = Vector3.new(-0.5, 1.2, 1.5)},
+			{Type = "Cylinder", Scale = Vector3.new(0.3, 0.8, 0.3), Offset = Vector3.new(0.5, 1.2, 1.5)}
+		},
+		Legs = {
+			{Type = "Cylinder", Scale = Vector3.new(0.3, 0.8, 0.3), Offset = Vector3.new(-0.6, -1, 0.8)},
+			{Type = "Cylinder", Scale = Vector3.new(0.3, 0.8, 0.3), Offset = Vector3.new(0.6, -1, 0.8)},
+			{Type = "Cylinder", Scale = Vector3.new(0.3, 0.8, 0.3), Offset = Vector3.new(-0.6, -1, -0.8)},
+			{Type = "Cylinder", Scale = Vector3.new(0.3, 0.8, 0.3), Offset = Vector3.new(0.6, -1, -0.8)}
+		},
+		Tail = {Type = "Cylinder", Scale = Vector3.new(0.2, 1, 0.2), Offset = Vector3.new(0, 0.5, -2)}
+	},
+
+	-- Cat-like creature
+	Cat = {
+		Body = {Type = "Ball", Scale = Vector3.new(1.5, 1.2, 2)},
+		Head = {Type = "Ball", Scale = Vector3.new(1, 1, 1), Offset = Vector3.new(0, 0.3, 1.2)},
+		Ears = {
+			{Type = "Wedge", Scale = Vector3.new(0.4, 0.6, 0.3), Offset = Vector3.new(-0.4, 1, 1.2)},
+			{Type = "Wedge", Scale = Vector3.new(0.4, 0.6, 0.3), Offset = Vector3.new(0.4, 1, 1.2)}
+		},
+		Legs = {
+			{Type = "Cylinder", Scale = Vector3.new(0.25, 0.7, 0.25), Offset = Vector3.new(-0.5, -0.9, 0.6)},
+			{Type = "Cylinder", Scale = Vector3.new(0.25, 0.7, 0.25), Offset = Vector3.new(0.5, -0.9, 0.6)},
+			{Type = "Cylinder", Scale = Vector3.new(0.25, 0.7, 0.25), Offset = Vector3.new(-0.5, -0.9, -0.6)},
+			{Type = "Cylinder", Scale = Vector3.new(0.25, 0.7, 0.25), Offset = Vector3.new(0.5, -0.9, -0.6)}
+		},
+		Tail = {Type = "Cylinder", Scale = Vector3.new(0.15, 1.5, 0.15), Offset = Vector3.new(0, 0.3, -1.5)}
+	},
+
+	-- Dragon-like creature
+	Dragon = {
+		Body = {Type = "Ball", Scale = Vector3.new(2, 1.8, 3)},
+		Head = {Type = "Wedge", Scale = Vector3.new(1.5, 1.5, 2), Offset = Vector3.new(0, 0.8, 2.5)},
+		Horns = {
+			{Type = "Cone", Scale = Vector3.new(0.3, 0.8, 0.3), Offset = Vector3.new(-0.5, 2, 2.5)},
+			{Type = "Cone", Scale = Vector3.new(0.3, 0.8, 0.3), Offset = Vector3.new(0.5, 2, 2.5)}
+		},
+		Wings = {
+			{Type = "Wedge", Scale = Vector3.new(0.2, 2, 1.5), Offset = Vector3.new(-2, 1, 0)},
+			{Type = "Wedge", Scale = Vector3.new(0.2, 2, 1.5), Offset = Vector3.new(2, 1, 0)}
+		},
+		Tail = {Type = "Cylinder", Scale = Vector3.new(0.3, 2, 0.3), Offset = Vector3.new(0, 0.5, -3)}
+	},
+
+	-- Bird-like creature
+	Bird = {
+		Body = {Type = "Ball", Scale = Vector3.new(1, 1.2, 1.5)},
+		Head = {Type = "Ball", Scale = Vector3.new(0.6, 0.6, 0.6), Offset = Vector3.new(0, 0.8, 0.8)},
+		Beak = {Type = "Wedge", Scale = Vector3.new(0.2, 0.3, 0.5), Offset = Vector3.new(0, 0.8, 1.2)},
+		Wings = {
+			{Type = "Wedge", Scale = Vector3.new(0.1, 1.5, 1), Offset = Vector3.new(-1.2, 0.5, 0)},
+			{Type = "Wedge", Scale = Vector3.new(0.1, 1.5, 1), Offset = Vector3.new(1.2, 0.5, 0)}
+		},
+		Tail = {Type = "Wedge", Scale = Vector3.new(0.3, 0.8, 0.8), Offset = Vector3.new(0, 0, -1.2)}
+	},
+
+	-- Simple creatures for common pets
+	Simple = {
+		Body = {Type = "Ball", Scale = Vector3.new(1.5, 1.5, 1.5)},
+		Eyes = {
+			{Type = "Ball", Scale = Vector3.new(0.3, 0.3, 0.3), Offset = Vector3.new(-0.4, 0.5, 1.2)},
+			{Type = "Ball", Scale = Vector3.new(0.3, 0.3, 0.3), Offset = Vector3.new(0.4, 0.5, 1.2)}
+		}
+	}
+}
+
+-- Color palettes for different rarities
+local COLOR_PALETTES = {
+	Common = {
+		Color3.fromRGB(139, 69, 19),   -- Brown
+		Color3.fromRGB(192, 192, 192), -- Gray
+		Color3.fromRGB(210, 180, 140), -- Tan
+		Color3.fromRGB(245, 245, 220)  -- Beige
+	},
+	Uncommon = {
+		Color3.fromRGB(0, 100, 0),     -- Dark Green
+		Color3.fromRGB(70, 130, 180),  -- Steel Blue
+		Color3.fromRGB(218, 165, 32),  -- Golden Rod
+		Color3.fromRGB(147, 112, 219)  -- Medium Purple
+	},
+	Rare = {
+		Color3.fromRGB(255, 140, 0),   -- Dark Orange
+		Color3.fromRGB(0, 206, 209),   -- Dark Turquoise
+		Color3.fromRGB(255, 20, 147),  -- Deep Pink
+		Color3.fromRGB(50, 205, 50)    -- Lime Green
+	},
+	Epic = {
+		Color3.fromRGB(138, 43, 226),  -- Blue Violet
+		Color3.fromRGB(255, 0, 255),   -- Magenta
+		Color3.fromRGB(255, 215, 0),   -- Gold
+		Color3.fromRGB(0, 255, 255)    -- Cyan
+	},
+	Legendary = {
+		Color3.fromRGB(255, 215, 0),   -- Gold
+		Color3.fromRGB(255, 0, 0),     -- Red
+		Color3.fromRGB(148, 0, 211),   -- Dark Violet
+		Color3.fromRGB(0, 255, 127)    -- Spring Green
+	}
+}
+
+-- Create a basic Part with specified shape
+local function createPart(partType, size, position)
+	local part = Instance.new("Part")
+
+	if partType == "Ball" then
+		part.Shape = Enum.PartType.Ball
+	elseif partType == "Cylinder" then
+		part.Shape = Enum.PartType.Cylinder
+	elseif partType == "Wedge" then
+		part = Instance.new("WedgePart")
+	elseif partType == "Cone" then
+		local cone = Instance.new("MeshPart")
+		cone.MeshId = "rbxassetid://1033714" -- Free Roblox cone mesh
+		part = cone
+	end
+
+	part.Size = size
+	part.Position = position
+	part.Anchored = false
+	part.CanCollide = false
+	part.TopSurface = Enum.SurfaceType.Smooth
+	part.BottomSurface = Enum.SurfaceType.Smooth
+
+	return part
+end
+
+-- Generate a pet model from a template
+function ProceduralPetGenerator:GeneratePet(petName, rarity, isShiny)
+	-- Determine template based on pet name
+	local template = PET_TEMPLATES.Simple -- Default
+
+	if petName == "Dog" or petName == "Loyal Dog" then
+		template = PET_TEMPLATES.Dog
+	elseif petName == "Cat" or petName == "Nimble Cat" then
+		template = PET_TEMPLATES.Cat
+	elseif petName:find("Dragon") or petName:find("Phoenix") then
+		template = PET_TEMPLATES.Dragon
+	elseif petName:find("Bird") or petName:find("Eagle") then
+		template = PET_TEMPLATES.Bird
+	end
+
+	-- Choose color palette
+	local colorPalette = COLOR_PALETTES[rarity] or COLOR_PALETTES.Common
+	local baseColor = colorPalette[math.random(1, #colorPalette)]
+
+	-- Shiny pets get gold overlay
+	if isShiny then
+		baseColor = Color3.fromRGB(255, 215, 0) -- Gold
+	end
+
+	-- Create model container
+	local model = Instance.new("Model")
+	model.Name = petName
+
+	local parts = {}
+
+	-- Create body (main part)
+	if template.Body then
+		local body = createPart(template.Body.Type, template.Body.Scale, Vector3.new(0, 0, 0))
+		body.Name = "Body"
+		body.Color = baseColor
+		body.Parent = model
+		table.insert(parts, body)
+	end
+
+	-- Create head
+	if template.Head then
+		local head = createPart(template.Head.Type, template.Head.Scale, template.Head.Offset)
+		head.Name = "Head"
+		head.Color = baseColor
+		head.Parent = model
+		table.insert(parts, head)
+	end
+
+	-- Create ears
+	if template.Ears then
+		for i, earData in ipairs(template.Ears) do
+			local ear = createPart(earData.Type, earData.Scale, earData.Offset)
+			ear.Name = "Ear" .. i
+			ear.Color = baseColor
+			ear.Parent = model
+			table.insert(parts, ear)
+		end
+	end
+
+	-- Create legs
+	if template.Legs then
+		for i, legData in ipairs(template.Legs) do
+			local leg = createPart(legData.Type, legData.Scale, legData.Offset)
+			leg.Name = "Leg" .. i
+			leg.Color = baseColor
+			leg.Parent = model
+			table.insert(parts, leg)
+		end
+	end
+
+	-- Create tail
+	if template.Tail then
+		local tail = createPart(template.Tail.Type, template.Tail.Scale, template.Tail.Offset)
+		tail.Name = "Tail"
+		tail.Color = baseColor
+		tail.Parent = model
+		table.insert(parts, tail)
+	end
+
+	-- Create horns (dragons)
+	if template.Horns then
+		for i, hornData in ipairs(template.Horns) do
+			local horn = createPart(hornData.Type, hornData.Scale, hornData.Offset)
+			horn.Name = "Horn" .. i
+			horn.Color = baseColor
+			horn.Parent = model
+			table.insert(parts, horn)
+		end
+	end
+
+	-- Create wings (dragons/birds)
+	if template.Wings then
+		for i, wingData in ipairs(template.Wings) do
+			local wing = createPart(wingData.Type, wingData.Scale, wingData.Offset)
+			wing.Name = "Wing" .. i
+			wing.Color = baseColor
+			wing.Parent = model
+			table.insert(parts, wing)
+		end
+	end
+
+	-- Create eyes (simple pets)
+	if template.Eyes then
+		for i, eyeData in ipairs(template.Eyes) do
+			local eye = createPart(eyeData.Type, eyeData.Scale, eyeData.Offset)
+			eye.Name = "Eye" .. i
+			eye.Color = Color3.fromRGB(0, 0, 0) -- Black eyes
+			eye.Parent = model
+			table.insert(parts, eye)
+		end
+	end
+
+	-- Create beak (birds)
+	if template.Beak then
+		local beak = createPart(template.Beak.Type, template.Beak.Scale, template.Beak.Offset)
+		beak.Name = "Beak"
+		beak.Color = Color3.fromRGB(255, 165, 0) -- Orange
+		beak.Parent = model
+		table.insert(parts, beak)
+	end
+
+	-- Weld all parts together
+	local primaryPart = model:FindFirstChild("Body") or parts[1]
+	model.PrimaryPart = primaryPart
+
+	for _, part in ipairs(parts) do
+		if part ~= primaryPart then
+			local weld = Instance.new("WeldConstraint")
+			weld.Part0 = primaryPart
+			weld.Part1 = part
+			weld.Parent = primaryPart
+		end
+	end
+
+	-- Add sparkle effect for shiny pets
+	if isShiny then
+		local sparkle = Instance.new("Sparkles")
+		sparkle.Parent = primaryPart
+	end
+
+	return model
+end
+
+-- ROBLOX CUBE AI INTEGRATION (March 2025)
+-- Generate pets using AI when available
+function ProceduralPetGenerator:GenerateWithCubeAI(prompt)
+	--[[
+		ROBLOX CUBE AI - Available March 2025
+
+		Usage in Studio:
+		1. Open Assistant panel
+		2. Type: /generate [your prompt]
+		3. Example: /generate cute dog pet
+
+		Usage in Lua API (when available):
+		local MeshGenerationService = game:GetService("MeshGenerationService")
+		local mesh = MeshGenerationService:GenerateMesh(prompt)
+
+		For now, this returns procedural Part-based pets
+		Update this function when Cube AI Lua API is released
+	]]
+
+	warn("[ProceduralPetGenerator] Cube AI Lua API not yet available")
+	warn("[ProceduralPetGenerator] Using procedural Part-based generation instead")
+	warn("[ProceduralPetGenerator] To use AI: Open Studio Assistant and type '/generate " .. prompt .. "'")
+
+	-- Fallback to procedural generation
+	return self:GeneratePet("Simple", "Common", false)
+end
+
+return ProceduralPetGenerator
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBXD20E9DB7A9004D90B90C5CC204F43E35">
+		<Properties>
+			<string name="Name">EventManager</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	EventManager - Manages seasonal events, limited-time content, and special rewards
+	Keeps the game fresh with rotating content
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+
+local DataManager = require(ServerScriptService.Modules.DataManager)
+local Config = require(ReplicatedStorage.Shared.Config)
+
+local EventManager = {}
+EventManager.ActiveEvents = {}
+EventManager.CurrentSeason = "Default"
+
+function EventManager:Initialize()
+	print("[EventManager] Initializing...")
+
+	-- Check for active events
+	self:CheckEvents()
+
+	-- Setup event check loop (every hour)
+	task.spawn(function()
+		while true do
+			task.wait(3600) -- 1 hour
+			self:CheckEvents()
+		end
+	end)
+
+	-- Setup remotes
+	local claimEventReward = ReplicatedStorage.Remotes.ClaimEventReward
+	claimEventReward.OnServerEvent:Connect(function(player, eventId, rewardId)
+		self:ClaimEventReward(player, eventId, rewardId)
+	end)
+
+	print("[EventManager] Initialized successfully!")
+end
+
+-- Check and activate events based on date
+function EventManager:CheckEvents()
+	local currentTime = os.time()
+	local dateTable = os.date("*t", currentTime)
+
+	-- Clear expired events
+	for eventId, eventData in pairs(self.ActiveEvents) do
+		if currentTime > eventData.EndTime then
+			self:EndEvent(eventId)
+		end
+	end
+
+	-- Check for new events
+	for eventId, eventConfig in pairs(Config.EVENTS) do
+		if not self.ActiveEvents[eventId] then
+			-- Check if event should be active
+			local shouldActivate = false
+
+			if eventConfig.Type == "Seasonal" then
+				-- Check month/day
+				if dateTable.month == eventConfig.Month then
+					shouldActivate = true
+				end
+			elseif eventConfig.Type == "Weekend" then
+				-- Check if weekend (Saturday or Sunday)
+				if dateTable.wday == 1 or dateTable.wday == 7 then
+					shouldActivate = true
+				end
+			elseif eventConfig.Type == "Special" then
+				-- Check specific date range
+				if currentTime >= eventConfig.StartTime and currentTime <= eventConfig.EndTime then
+					shouldActivate = true
+				end
+			end
+
+			if shouldActivate then
+				self:StartEvent(eventId, eventConfig)
+			end
+		end
+	end
+
+	-- Determine current season
+	self:UpdateSeason(dateTable.month)
+end
+
+-- Start an event
+function EventManager:StartEvent(eventId, eventConfig)
+	print("[EventManager] Starting event:", eventId)
+
+	self.ActiveEvents[eventId] = {
+		Id = eventId,
+		Name = eventConfig.Name,
+		StartTime = os.time(),
+		EndTime = eventConfig.EndTime or (os.time() + eventConfig.Duration),
+		Rewards = eventConfig.Rewards,
+		Multipliers = eventConfig.Multipliers or {}
+	}
+
+	-- Notify all players
+	for _, player in ipairs(game.Players:GetPlayers()) do
+		ReplicatedStorage.Remotes.EventStarted:FireClient(player, self.ActiveEvents[eventId])
+	end
+end
+
+-- End an event
+function EventManager:EndEvent(eventId)
+	print("[EventManager] Ending event:", eventId)
+
+	local eventData = self.ActiveEvents[eventId]
+	if not eventData then return end
+
+	-- Notify all players
+	for _, player in ipairs(game.Players:GetPlayers()) do
+		ReplicatedStorage.Remotes.EventEnded:FireClient(player, eventId)
+	end
+
+	self.ActiveEvents[eventId] = nil
+end
+
+-- Update current season
+function EventManager:UpdateSeason(month)
+	local newSeason = "Default"
+
+	if month >= 3 and month <= 5 then
+		newSeason = "Spring"
+	elseif month >= 6 and month <= 8 then
+		newSeason = "Summer"
+	elseif month >= 9 and month <= 11 then
+		newSeason = "Autumn"
+	elseif month == 12 or month <= 2 then
+		newSeason = "Winter"
+	end
+
+	if newSeason ~= self.CurrentSeason then
+		self.CurrentSeason = newSeason
+		print("[EventManager] Season changed to:", newSeason)
+
+		-- Apply seasonal changes
+		self:ApplySeasonalChanges(newSeason)
+	end
+end
+
+-- Apply seasonal visual and gameplay changes
+function EventManager:ApplySeasonalChanges(season)
+	-- Update lighting, decorations, etc.
+	local lighting = game:GetService("Lighting")
+
+	if season == "Winter" then
+		lighting.Ambient = Color3.fromRGB(200, 220, 255)
+	elseif season == "Spring" then
+		lighting.Ambient = Color3.fromRGB(255, 240, 220)
+	elseif season == "Summer" then
+		lighting.Ambient = Color3.fromRGB(255, 250, 200)
+	elseif season == "Autumn" then
+		lighting.Ambient = Color3.fromRGB(255, 200, 150)
+	end
+
+	-- Notify all players
+	for _, player in ipairs(game.Players:GetPlayers()) do
+		ReplicatedStorage.Remotes.SeasonChanged:FireClient(player, season)
+	end
+end
+
+-- Claim event reward
+function EventManager:ClaimEventReward(player, eventId, rewardId)
+	local eventData = self.ActiveEvents[eventId]
+	if not eventData then
+		ReplicatedStorage.Remotes.EventError:FireClient(player, "Event not active")
+		return
+	end
+
+	local playerData = DataManager:GetData(player)
+	if not playerData then return end
+
+	-- Initialize event data
+	if not playerData.EventData then
+		playerData.EventData = {}
+	end
+	if not playerData.EventData[eventId] then
+		playerData.EventData[eventId] = {
+			ClaimedRewards = {}
+		}
+	end
+
+	-- Check if already claimed
+	if table.find(playerData.EventData[eventId].ClaimedRewards, rewardId) then
+		ReplicatedStorage.Remotes.EventError:FireClient(player, "Reward already claimed")
+		return
+	end
+
+	-- Find reward
+	local reward = nil
+	for _, r in ipairs(eventData.Rewards) do
+		if r.Id == rewardId then
+			reward = r
+			break
+		end
+	end
+
+	if not reward then return end
+
+	-- Check requirements
+	if reward.RequiredProgress and playerData.EventData[eventId].Progress < reward.RequiredProgress then
+		ReplicatedStorage.Remotes.EventError:FireClient(player, "Requirements not met")
+		return
+	end
+
+	-- Award reward
+	if reward.Type == "Coins" then
+		DataManager:AddCurrency(player, "Coins", reward.Amount)
+	elseif reward.Type == "Gems" then
+		DataManager:AddCurrency(player, "Gems", reward.Amount)
+	elseif reward.Type == "Pet" then
+		-- Award special event pet
+		-- Implementation would go here
+	end
+
+	-- Mark as claimed
+	table.insert(playerData.EventData[eventId].ClaimedRewards, rewardId)
+
+	ReplicatedStorage.Remotes.EventRewardClaimed:FireClient(player, rewardId, reward)
+
+	print(string.format("[EventManager] %s claimed reward %s from event %s",
+		player.Name, rewardId, eventId))
+end
+
+-- Get active event multipliers
+function EventManager:GetMultipliers()
+	local multipliers = {
+		Coins = 1,
+		Experience = 1,
+		PetHatchRate = 1
+	}
+
+	for _, eventData in pairs(self.ActiveEvents) do
+		if eventData.Multipliers then
+			for key, value in pairs(eventData.Multipliers) do
+				multipliers[key] = multipliers[key] * value
+			end
+		end
+	end
+
+	return multipliers
+end
+
+return EventManager
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBX11BFF5A2DAF046C0A02B0CCD4F20F5B8">
+		<Properties>
+			<string name="Name">ObbyManager</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	ObbyManager - Manages parkour courses for pet training and rewards
+	Players complete obstacle courses to train pets and earn bonuses
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+
+local DataManager = require(ServerScriptService.Modules.DataManager)
+local Config = require(ReplicatedStorage.Shared.Config)
+
+local ObbyManager = {}
+ObbyManager.ActiveRuns = {} -- player.UserId -> run data
+
+function ObbyManager:Initialize()
+	print("[ObbyManager] Initializing...")
+
+	-- Setup remotes
+	local startObby = ReplicatedStorage.Remotes.StartObby
+	startObby.OnServerEvent:Connect(function(player, obbyId)
+		self:StartObby(player, obbyId)
+	end)
+
+	local completeObby = ReplicatedStorage.Remotes.CompleteObby
+	completeObby.OnServerEvent:Connect(function(player, obbyId)
+		self:CompleteObby(player, obbyId)
+	end)
+
+	local checkpointReached = ReplicatedStorage.Remotes.CheckpointReached
+	checkpointReached.OnServerEvent:Connect(function(player, checkpointNumber)
+		self:CheckpointReached(player, checkpointNumber)
+	end)
+
+	print("[ObbyManager] Initialized successfully!")
+end
+
+-- Start obby run
+function ObbyManager:StartObby(player, obbyId)
+	local obbyConfig = Config.OBBIES[obbyId]
+	if not obbyConfig then
+		warn("[ObbyManager] Invalid obby ID:", obbyId)
+		return
+	end
+
+	-- Check if player meets requirements
+	local playerData = DataManager:GetData(player)
+	if not playerData then return end
+
+	if playerData.Level < obbyConfig.RequiredLevel then
+		ReplicatedStorage.Remotes.ObbyError:FireClient(player, "Level too low")
+		return
+	end
+
+	-- Initialize run
+	self.ActiveRuns[player.UserId] = {
+		ObbyId = obbyId,
+		StartTime = tick(),
+		Checkpoints = {},
+		CurrentCheckpoint = 0
+	}
+
+	ReplicatedStorage.Remotes.ObbyStarted:FireClient(player, obbyId)
+
+	print(string.format("[ObbyManager] %s started obby: %s", player.Name, obbyId))
+end
+
+-- Checkpoint reached
+function ObbyManager:CheckpointReached(player, checkpointNumber)
+	local run = self.ActiveRuns[player.UserId]
+	if not run then return end
+
+	-- Validate checkpoint order
+	if checkpointNumber == run.CurrentCheckpoint + 1 then
+		run.CurrentCheckpoint = checkpointNumber
+		table.insert(run.Checkpoints, {
+			Number = checkpointNumber,
+			Time = tick() - run.StartTime
+		})
+
+		ReplicatedStorage.Remotes.CheckpointReached:FireClient(player, checkpointNumber)
+	end
+end
+
+-- Complete obby
+function ObbyManager:CompleteObby(player, obbyId)
+	local run = self.ActiveRuns[player.UserId]
+	if not run or run.ObbyId ~= obbyId then return end
+
+	local playerData = DataManager:GetData(player)
+	if not playerData then return end
+
+	local obbyConfig = Config.OBBIES[obbyId]
+	if not obbyConfig then return end
+
+	-- Calculate completion time
+	local completionTime = tick() - run.StartTime
+
+	-- Check for new best time
+	local isNewBest = false
+	local previousBest = playerData.BestObbyTimes[obbyId]
+
+	if not previousBest or completionTime < previousBest then
+		playerData.BestObbyTimes[obbyId] = completionTime
+		isNewBest = true
+	end
+
+	-- Mark as completed
+	if not table.find(playerData.CompletedObbies, obbyId) then
+		table.insert(playerData.CompletedObbies, obbyId)
+	end
+
+	-- Calculate rewards
+	local baseReward = obbyConfig.RewardCoins
+	local timeBonus = 0
+
+	if completionTime < obbyConfig.ParTime then
+		timeBonus = math.floor(baseReward * 0.5) -- 50% bonus for beating par time
+	end
+
+	local totalReward = baseReward + timeBonus
+
+	-- Award rewards
+	DataManager:AddCurrency(player, "Coins", totalReward)
+	DataManager:AddExperience(player, obbyConfig.ExperienceReward)
+
+	-- Train equipped pets (increase power slightly)
+	for _, petId in ipairs(playerData.EquippedPets) do
+		for _, pet in ipairs(playerData.Pets) do
+			if pet.Id == petId then
+				pet.PowerMultiplier += 0.01 -- Small boost
+				break
+			end
+		end
+	end
+
+	-- Send completion data to client
+	ReplicatedStorage.Remotes.ObbyCompleted:FireClient(player, {
+		ObbyId = obbyId,
+		Time = completionTime,
+		IsNewBest = isNewBest,
+		Reward = totalReward,
+		TimeBonus = timeBonus
+	})
+
+	-- Clean up
+	self.ActiveRuns[player.UserId] = nil
+
+	print(string.format("[ObbyManager] %s completed %s in %.2f seconds (Best: %s)",
+		player.Name, obbyId, completionTime, isNewBest and "YES" or "NO"))
+end
+
+-- Get leaderboard for obby
+function ObbyManager:GetLeaderboard(obbyId)
+	-- In production, this would query all player data
+	-- For now, return empty
+	return {}
+end
+
+return ObbyManager
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBX3AF70B14E0DF4BF0B531367713F600A1">
+		<Properties>
+			<string name="Name">TradingSystem</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	TradingSystem - Manages peer-to-peer pet trading between players
+	Includes trade requests, verification, and completion
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+
+local DataManager = require(ServerScriptService.Modules.DataManager)
+local Config = require(ReplicatedStorage.Shared.Config)
+
+local TradingSystem = {}
+TradingSystem.ActiveTrades = {} -- tradeId -> trade data
+TradingSystem.PlayerTrades = {} -- playerId -> tradeId
+
+function TradingSystem:Initialize()
+	print("[TradingSystem] Initializing...")
+
+	-- Setup remotes
+	local sendTradeRequest = ReplicatedStorage.Remotes.SendTradeRequest
+	sendTradeRequest.OnServerEvent:Connect(function(player, targetPlayer)
+		self:SendTradeRequest(player, targetPlayer)
+	end)
+
+	local acceptTradeRequest = ReplicatedStorage.Remotes.AcceptTradeRequest
+	acceptTradeRequest.OnServerEvent:Connect(function(player, tradeId)
+		self:AcceptTradeRequest(player, tradeId)
+	end)
+
+	local declineTradeRequest = ReplicatedStorage.Remotes.DeclineTradeRequest
+	declineTradeRequest.OnServerEvent:Connect(function(player, tradeId)
+		self:DeclineTradeRequest(player, tradeId)
+	end)
+
+	local addTradeItem = ReplicatedStorage.Remotes.AddTradeItem
+	addTradeItem.OnServerEvent:Connect(function(player, tradeId, petId)
+		self:AddTradeItem(player, tradeId, petId)
+	end)
+
+	local removeTradeItem = ReplicatedStorage.Remotes.RemoveTradeItem
+	removeTradeItem.OnServerEvent:Connect(function(player, tradeId, petId)
+		self:RemoveTradeItem(player, tradeId, petId)
+	end)
+
+	local confirmTrade = ReplicatedStorage.Remotes.ConfirmTrade
+	confirmTrade.OnServerEvent:Connect(function(player, tradeId)
+		self:ConfirmTrade(player, tradeId)
+	end)
+
+	local cancelTrade = ReplicatedStorage.Remotes.CancelTrade
+	cancelTrade.OnServerEvent:Connect(function(player, tradeId)
+		self:CancelTrade(player, tradeId)
+	end)
+
+	print("[TradingSystem] Initialized successfully!")
+end
+
+-- Generate trade ID
+local function generateTradeId()
+	return game:GetService("HttpService"):GenerateGUID(false)
+end
+
+-- Send trade request to another player
+function TradingSystem:SendTradeRequest(player, targetPlayer)
+	if not targetPlayer or not targetPlayer.Parent then
+		ReplicatedStorage.Remotes.TradeError:FireClient(player, "Player not found")
+		return
+	end
+
+	if player == targetPlayer then
+		ReplicatedStorage.Remotes.TradeError:FireClient(player, "Cannot trade with yourself")
+		return
+	end
+
+	-- Check if already in trade
+	if self.PlayerTrades[player.UserId] then
+		ReplicatedStorage.Remotes.TradeError:FireClient(player, "You are already in a trade")
+		return
+	end
+
+	if self.PlayerTrades[targetPlayer.UserId] then
+		ReplicatedStorage.Remotes.TradeError:FireClient(player, "Target player is already in a trade")
+		return
+	end
+
+	-- Create trade
+	local tradeId = generateTradeId()
+	self.ActiveTrades[tradeId] = {
+		Id = tradeId,
+		Player1 = player,
+		Player2 = targetPlayer,
+		Player1Items = {},
+		Player2Items = {},
+		Player1Confirmed = false,
+		Player2Confirmed = false,
+		Status = "pending"
+	}
+
+	-- Send request to target
+	ReplicatedStorage.Remotes.TradeRequest:FireClient(targetPlayer, player, tradeId)
+
+	print(string.format("[TradingSystem] %s sent trade request to %s", player.Name, targetPlayer.Name))
+end
+
+-- Accept trade request
+function TradingSystem:AcceptTradeRequest(player, tradeId)
+	local trade = self.ActiveTrades[tradeId]
+	if not trade then return end
+
+	if trade.Player2 ~= player then return end
+
+	trade.Status = "active"
+	self.PlayerTrades[trade.Player1.UserId] = tradeId
+	self.PlayerTrades[trade.Player2.UserId] = tradeId
+
+	-- Notify both players
+	ReplicatedStorage.Remotes.TradeAccepted:FireClient(trade.Player1, trade)
+	ReplicatedStorage.Remotes.TradeAccepted:FireClient(trade.Player2, trade)
+
+	print(string.format("[TradingSystem] %s accepted trade from %s", player.Name, trade.Player1.Name))
+end
+
+-- Decline trade request
+function TradingSystem:DeclineTradeRequest(player, tradeId)
+	local trade = self.ActiveTrades[tradeId]
+	if not trade then return end
+
+	if trade.Player2 ~= player then return end
+
+	-- Notify requester
+	ReplicatedStorage.Remotes.TradeDeclined:FireClient(trade.Player1)
+
+	-- Clean up
+	self.ActiveTrades[tradeId] = nil
+
+	print(string.format("[TradingSystem] %s declined trade from %s", player.Name, trade.Player1.Name))
+end
+
+-- Add item to trade
+function TradingSystem:AddTradeItem(player, tradeId, petId)
+	local trade = self.ActiveTrades[tradeId]
+	if not trade or trade.Status ~= "active" then return end
+
+	local playerData = DataManager:GetData(player)
+	if not playerData then return end
+
+	-- Verify player owns pet
+	local ownsPet = false
+	for _, pet in ipairs(playerData.Pets) do
+		if pet.Id == petId then
+			ownsPet = true
+			break
+		end
+	end
+
+	if not ownsPet then
+		ReplicatedStorage.Remotes.TradeError:FireClient(player, "You don't own this pet")
+		return
+	end
+
+	-- Add to appropriate side
+	if trade.Player1 == player then
+		if #trade.Player1Items >= Config.MAX_TRADE_ITEMS then
+			ReplicatedStorage.Remotes.TradeError:FireClient(player, "Maximum items reached")
+			return
+		end
+		table.insert(trade.Player1Items, petId)
+		trade.Player1Confirmed = false
+	elseif trade.Player2 == player then
+		if #trade.Player2Items >= Config.MAX_TRADE_ITEMS then
+			ReplicatedStorage.Remotes.TradeError:FireClient(player, "Maximum items reached")
+			return
+		end
+		table.insert(trade.Player2Items, petId)
+		trade.Player2Confirmed = false
+	end
+
+	-- Update both players
+	ReplicatedStorage.Remotes.TradeUpdated:FireClient(trade.Player1, trade)
+	ReplicatedStorage.Remotes.TradeUpdated:FireClient(trade.Player2, trade)
+end
+
+-- Remove item from trade
+function TradingSystem:RemoveTradeItem(player, tradeId, petId)
+	local trade = self.ActiveTrades[tradeId]
+	if not trade or trade.Status ~= "active" then return end
+
+	-- Remove from appropriate side
+	if trade.Player1 == player then
+		local index = table.find(trade.Player1Items, petId)
+		if index then
+			table.remove(trade.Player1Items, index)
+			trade.Player1Confirmed = false
+		end
+	elseif trade.Player2 == player then
+		local index = table.find(trade.Player2Items, petId)
+		if index then
+			table.remove(trade.Player2Items, index)
+			trade.Player2Confirmed = false
+		end
+	end
+
+	-- Update both players
+	ReplicatedStorage.Remotes.TradeUpdated:FireClient(trade.Player1, trade)
+	ReplicatedStorage.Remotes.TradeUpdated:FireClient(trade.Player2, trade)
+end
+
+-- Confirm trade
+function TradingSystem:ConfirmTrade(player, tradeId)
+	local trade = self.ActiveTrades[tradeId]
+	if not trade or trade.Status ~= "active" then return end
+
+	if trade.Player1 == player then
+		trade.Player1Confirmed = true
+	elseif trade.Player2 == player then
+		trade.Player2Confirmed = true
+	end
+
+	-- Update both players
+	ReplicatedStorage.Remotes.TradeUpdated:FireClient(trade.Player1, trade)
+	ReplicatedStorage.Remotes.TradeUpdated:FireClient(trade.Player2, trade)
+
+	-- Execute if both confirmed
+	if trade.Player1Confirmed and trade.Player2Confirmed then
+		self:ExecuteTrade(tradeId)
+	end
+end
+
+-- Execute the trade
+function TradingSystem:ExecuteTrade(tradeId)
+	local trade = self.ActiveTrades[tradeId]
+	if not trade then return end
+
+	local player1Data = DataManager:GetData(trade.Player1)
+	local player2Data = DataManager:GetData(trade.Player2)
+
+	if not player1Data or not player2Data then
+		self:CancelTrade(trade.Player1, tradeId)
+		return
+	end
+
+	-- Transfer pets from player1 to player2
+	for _, petId in ipairs(trade.Player1Items) do
+		for i, pet in ipairs(player1Data.Pets) do
+			if pet.Id == petId then
+				table.insert(player2Data.Pets, pet)
+				table.remove(player1Data.Pets, i)
+				break
+			end
+		end
+	end
+
+	-- Transfer pets from player2 to player1
+	for _, petId in ipairs(trade.Player2Items) do
+		for i, pet in ipairs(player2Data.Pets) do
+			if pet.Id == petId then
+				table.insert(player1Data.Pets, pet)
+				table.remove(player2Data.Pets, i)
+				break
+			end
+		end
+	end
+
+	-- Update statistics
+	player1Data.TotalTradesCompleted += 1
+	player2Data.TotalTradesCompleted += 1
+
+	-- Notify both players
+	ReplicatedStorage.Remotes.TradeCompleted:FireClient(trade.Player1)
+	ReplicatedStorage.Remotes.TradeCompleted:FireClient(trade.Player2)
+
+	-- Clean up
+	self.PlayerTrades[trade.Player1.UserId] = nil
+	self.PlayerTrades[trade.Player2.UserId] = nil
+	self.ActiveTrades[tradeId] = nil
+
+	print(string.format("[TradingSystem] Trade completed between %s and %s",
+		trade.Player1.Name, trade.Player2.Name))
+end
+
+-- Cancel trade
+function TradingSystem:CancelTrade(player, tradeId)
+	local trade = self.ActiveTrades[tradeId]
+	if not trade then return end
+
+	-- Notify both players
+	ReplicatedStorage.Remotes.TradeCancelled:FireClient(trade.Player1)
+	ReplicatedStorage.Remotes.TradeCancelled:FireClient(trade.Player2)
+
+	-- Clean up
+	self.PlayerTrades[trade.Player1.UserId] = nil
+	self.PlayerTrades[trade.Player2.UserId] = nil
+	self.ActiveTrades[tradeId] = nil
+end
+
+-- Cancel all active trades for player (when leaving)
+function TradingSystem:CancelActiveTrades(player)
+	local tradeId = self.PlayerTrades[player.UserId]
+	if tradeId then
+		self:CancelTrade(player, tradeId)
+	end
+end
+
+return TradingSystem
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBX2B3B8FE8367F41E0931173BE23CC3CE9">
+		<Properties>
+			<string name="Name">EconomyManager</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	EconomyManager - Manages in-game economy, currency, and rewards
+	Handles daily bonuses, achievements, and monetization
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+local MarketplaceService = game:GetService("MarketplaceService")
+
+local DataManager = require(ServerScriptService.Modules.DataManager)
+local Config = require(ReplicatedStorage.Shared.Config)
+
+local EconomyManager = {}
+
+function EconomyManager:Initialize()
+	print("[EconomyManager] Initializing...")
+
+	-- Setup remotes
+	local claimDailyRemote = ReplicatedStorage.Remotes.ClaimDailyBonus
+	claimDailyRemote.OnServerEvent:Connect(function(player)
+		self:ClaimDailyBonus(player)
+	end)
+
+	-- Setup marketplace
+	MarketplaceService.ProcessReceipt = function(receiptInfo)
+		return self:ProcessReceipt(receiptInfo)
+	end
+
+	print("[EconomyManager] Initialized successfully!")
+end
+
+function EconomyManager:SetupPlayerEconomy(player, playerData)
+	-- Send initial currency state to client
+	ReplicatedStorage.Remotes.UpdateCurrency:FireClient(player, "Coins", playerData.Coins)
+	ReplicatedStorage.Remotes.UpdateCurrency:FireClient(player, "Gems", playerData.Gems)
+end
+
+-- Check and award daily bonus
+function EconomyManager:CheckDailyBonus(player)
+	local playerData = DataManager:GetData(player)
+	if not playerData then return end
+
+	local currentTime = os.time()
+	local lastLogin = playerData.LastLogin
+	local timeSinceLogin = currentTime - lastLogin
+
+	-- Check if eligible for daily bonus (24 hours)
+	if timeSinceLogin >= 86400 then
+		-- Award daily bonus
+		local streakBonus = math.min(playerData.LoginStreak, 7) -- Cap at 7 days
+		local coinsReward = 500 * streakBonus
+		local gemsReward = math.floor(streakBonus / 2)
+
+		DataManager:AddCurrency(player, "Coins", coinsReward)
+		DataManager:AddCurrency(player, "Gems", gemsReward)
+
+		ReplicatedStorage.Remotes.DailyBonusAvailable:FireClient(player, {
+			Streak = playerData.LoginStreak,
+			Coins = coinsReward,
+			Gems = gemsReward
+		})
+	end
+end
+
+-- Claim daily bonus
+function EconomyManager:ClaimDailyBonus(player)
+	local playerData = DataManager:GetData(player)
+	if not playerData then return end
+
+	local currentTime = os.time()
+	local lastClaim = playerData.LastDailyClaim or 0
+	local timeSinceClaim = currentTime - lastClaim
+
+	if timeSinceClaim >= 86400 then
+		local streakBonus = math.min(playerData.LoginStreak, 7)
+		local coinsReward = 500 * streakBonus
+		local gemsReward = math.floor(streakBonus / 2)
+
+		DataManager:AddCurrency(player, "Coins", coinsReward)
+		DataManager:AddCurrency(player, "Gems", gemsReward)
+
+		playerData.LastDailyClaim = currentTime
+
+		ReplicatedStorage.Remotes.DailyBonusClaimed:FireClient(player, {
+			Streak = playerData.LoginStreak,
+			Coins = coinsReward,
+			Gems = gemsReward
+		})
+	end
+end
+
+-- Process Robux purchases
+function EconomyManager:ProcessReceipt(receiptInfo)
+	local userId = receiptInfo.PlayerId
+	local productId = receiptInfo.ProductId
+
+	local player = game.Players:GetPlayerByUserId(userId)
+	if not player then
+		return Enum.ProductPurchaseDecision.NotProcessedYet
+	end
+
+	local playerData = DataManager:GetData(player)
+	if not playerData then
+		return Enum.ProductPurchaseDecision.NotProcessedYet
+	end
+
+	-- Process different products
+	local productConfig = Config.SHOP_PRODUCTS[productId]
+	if not productConfig then
+		warn("[EconomyManager] Unknown product ID:", productId)
+		return Enum.ProductPurchaseDecision.NotProcessedYet
+	end
+
+	-- Award product
+	if productConfig.Type == "Gems" then
+		DataManager:AddCurrency(player, "Gems", productConfig.Amount)
+	elseif productConfig.Type == "Coins" then
+		DataManager:AddCurrency(player, "Coins", productConfig.Amount)
+	elseif productConfig.Type == "Bundle" then
+		DataManager:AddCurrency(player, "Gems", productConfig.Gems)
+		DataManager:AddCurrency(player, "Coins", productConfig.Coins)
+	end
+
+	print(string.format("[EconomyManager] %s purchased %s", player.Name, productConfig.Name))
+
+	return Enum.ProductPurchaseDecision.PurchaseGranted
+end
+
+-- Award achievement rewards
+function EconomyManager:AwardAchievement(player, achievementId)
+	local playerData = DataManager:GetData(player)
+	if not playerData then return end
+
+	local achievement = Config.ACHIEVEMENTS[achievementId]
+	if not achievement then return end
+
+	-- Check if already claimed
+	if not playerData.CompletedAchievements then
+		playerData.CompletedAchievements = {}
+	end
+
+	if table.find(playerData.CompletedAchievements, achievementId) then
+		return -- Already claimed
+	end
+
+	-- Award rewards
+	DataManager:AddCurrency(player, "Coins", achievement.CoinsReward or 0)
+	DataManager:AddCurrency(player, "Gems", achievement.GemsReward or 0)
+
+	table.insert(playerData.CompletedAchievements, achievementId)
+
+	ReplicatedStorage.Remotes.AchievementUnlocked:FireClient(player, achievement)
+end
+
+return EconomyManager
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBXCC96F53DF1DC4ED98F57CBC9B8EB9542">
+		<Properties>
+			<string name="Name">TycoonManager</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	TycoonManager - Manages player-owned base building and automation
+	Players purchase buildings that generate passive income
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+
+local DataManager = require(ServerScriptService.Modules.DataManager)
+local ProceduralBuildingGenerator = require(ServerScriptService.Modules.ProceduralBuildingGenerator)
+local Config = require(ReplicatedStorage.Shared.Config)
+
+local TycoonManager = {}
+TycoonManager.PlayerBases = {} -- player.UserId -> base data
+
+function TycoonManager:Initialize()
+	print("[TycoonManager] Initializing...")
+
+	-- Setup remotes
+	local purchaseBuildingRemote = ReplicatedStorage.Remotes.PurchaseBuilding
+	purchaseBuildingRemote.OnServerEvent:Connect(function(player, buildingId)
+		self:PurchaseBuilding(player, buildingId)
+	end)
+
+	local collectIncomeRemote = ReplicatedStorage.Remotes.CollectIncome
+	collectIncomeRemote.OnServerEvent:Connect(function(player)
+		self:CollectIncome(player)
+	end)
+
+	-- Start income generation loop
+	task.spawn(function()
+		self:IncomeGenerationLoop()
+	end)
+
+	print("[TycoonManager] Initialized successfully!")
+end
+
+function TycoonManager:SetupPlayerBase(player, playerData)
+	-- Initialize base
+	self.PlayerBases[player.UserId] = {
+		Buildings = playerData.UnlockedBuildings,
+		PendingIncome = 0,
+		LastIncomeTime = tick()
+	}
+
+	-- Spawn base in world (simplified)
+	self:SpawnBase(player)
+end
+
+function TycoonManager:CleanupPlayerBase(player)
+	-- Clean up base
+	self:DespawnBase(player)
+	self.PlayerBases[player.UserId] = nil
+end
+
+-- Spawn player's base in workspace
+function TycoonManager:SpawnBase(player)
+	local character = player.Character
+	if not character then return end
+
+	-- Create base plot (simplified)
+	local basePlot = Instance.new("Part")
+	basePlot.Name = player.Name .. "_Base"
+	basePlot.Size = Vector3.new(50, 1, 50)
+	basePlot.Anchored = true
+	basePlot.BrickColor = BrickColor.new("Bright green")
+	basePlot.Position = Vector3.new(player.UserId % 10 * 60, 0.5, math.floor(player.UserId / 10) * 60)
+	basePlot.Parent = workspace.Bases or workspace
+
+	-- Spawn buildings
+	local baseData = self.PlayerBases[player.UserId]
+	for _, buildingId in ipairs(baseData.Buildings) do
+		self:SpawnBuilding(player, buildingId)
+	end
+end
+
+-- Despawn player's base
+function TycoonManager:DespawnBase(player)
+	local basePlot = workspace:FindFirstChild(player.Name .. "_Base")
+	if basePlot then
+		basePlot:Destroy()
+	end
+end
+
+-- Spawn individual building
+function TycoonManager:SpawnBuilding(player, buildingId)
+	local buildingConfig = Config.BUILDINGS[buildingId]
+	if not buildingConfig then return end
+
+	local basePlot = workspace:FindFirstChild(player.Name .. "_Base")
+	if not basePlot then return end
+
+	-- Create building model using ProceduralBuildingGenerator (NO mesh IDs!)
+	local buildingPosition = basePlot.Position + buildingConfig.Offset + Vector3.new(0, 5, 0)
+	local building = ProceduralBuildingGenerator:GenerateBuilding(
+		buildingConfig.Type or "Building",
+		buildingConfig.Name,
+		buildingPosition
+	)
+
+	if not building then
+		warn("[TycoonManager] Failed to generate building:", buildingId)
+		return
+	end
+
+	building.Name = "Building_" .. buildingId
+	building.Parent = basePlot
+
+	-- Generate purchase button if not owned yet
+	local playerData = DataManager:GetData(player)
+	if playerData and not table.find(playerData.UnlockedBuildings, buildingId) then
+		local button = ProceduralBuildingGenerator:GeneratePurchaseButton(
+			building,
+			buildingConfig.Cost,
+			buildingConfig.CostType or "Coins"
+		)
+		button.Parent = building
+	end
+end
+
+-- Purchase a building
+function TycoonManager:PurchaseBuilding(player, buildingId)
+	local playerData = DataManager:GetData(player)
+	if not playerData then return end
+
+	local buildingConfig = Config.BUILDINGS[buildingId]
+	if not buildingConfig then
+		warn("[TycoonManager] Invalid building ID:", buildingId)
+		return
+	end
+
+	-- Check if already owned
+	if table.find(playerData.UnlockedBuildings, buildingId) then
+		return
+	end
+
+	-- Check prerequisites
+	for _, prereq in ipairs(buildingConfig.Prerequisites) do
+		if not table.find(playerData.UnlockedBuildings, prereq) then
+			ReplicatedStorage.Remotes.PurchaseResult:FireClient(player, false, "Prerequisites not met")
+			return
+		end
+	end
+
+	-- Check cost
+	if playerData.Coins < buildingConfig.Cost then
+		ReplicatedStorage.Remotes.PurchaseResult:FireClient(player, false, "Not enough Coins")
+		return
+	end
+
+	-- Purchase building
+	DataManager:RemoveCurrency(player, "Coins", buildingConfig.Cost)
+	table.insert(playerData.UnlockedBuildings, buildingId)
+	table.insert(self.PlayerBases[player.UserId].Buildings, buildingId)
+
+	-- Spawn building
+	self:SpawnBuilding(player, buildingId)
+
+	-- Increase tycoon level
+	playerData.TycoonLevel += 1
+
+	ReplicatedStorage.Remotes.PurchaseResult:FireClient(player, true, buildingId)
+
+	print(string.format("[TycoonManager] %s purchased %s", player.Name, buildingId))
+end
+
+-- Income generation loop (runs every 5 seconds)
+function TycoonManager:IncomeGenerationLoop()
+	while true do
+		task.wait(5)
+
+		for userId, baseData in pairs(self.PlayerBases) do
+			local player = game.Players:GetPlayerByUserId(userId)
+			if player then
+				local income = self:CalculateIncome(player)
+				baseData.PendingIncome += income
+
+				-- Notify player
+				ReplicatedStorage.Remotes.IncomeGenerated:FireClient(player, baseData.PendingIncome)
+			end
+		end
+	end
+end
+
+-- Calculate passive income from buildings
+function TycoonManager:CalculateIncome(player)
+	local baseData = self.PlayerBases[player.UserId]
+	if not baseData then return 0 end
+
+	local totalIncome = 0
+
+	for _, buildingId in ipairs(baseData.Buildings) do
+		local buildingConfig = Config.BUILDINGS[buildingId]
+		if buildingConfig then
+			totalIncome += buildingConfig.IncomePerSecond * 5 -- 5 second interval
+		end
+	end
+
+	return totalIncome
+end
+
+-- Collect pending income
+function TycoonManager:CollectIncome(player)
+	local baseData = self.PlayerBases[player.UserId]
+	if not baseData then return end
+
+	if baseData.PendingIncome > 0 then
+		DataManager:AddCurrency(player, "Coins", math.floor(baseData.PendingIncome))
+
+		ReplicatedStorage.Remotes.IncomeCollected:FireClient(player, baseData.PendingIncome)
+
+		baseData.PendingIncome = 0
+	end
+end
+
+return TycoonManager
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBX08C265F5EC5B4DAEAE71FE1018CC0DCE">
+		<Properties>
+			<string name="Name">TowerDefenseManager</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	TowerDefenseManager - Handles wave-based enemy spawning and tower defense gameplay
+	Players use their pets to defend against waves of enemies
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+
+local DataManager = require(ServerScriptService.Modules.DataManager)
+local ProceduralEnemyGenerator = require(ServerScriptService.Modules.ProceduralEnemyGenerator)
+local Config = require(ReplicatedStorage.Shared.Config)
+
+local TowerDefenseManager = {}
+TowerDefenseManager.ActiveGames = {} -- player.UserId -> game state
+
+function TowerDefenseManager:Initialize()
+	print("[TowerDefenseManager] Initializing...")
+
+	-- Setup remotes
+	local startWaveRemote = ReplicatedStorage.Remotes.StartWave
+	startWaveRemote.OnServerEvent:Connect(function(player)
+		self:StartWave(player)
+	end)
+
+	local placeTowerRemote = ReplicatedStorage.Remotes.PlaceTower
+	placeTowerRemote.OnServerEvent:Connect(function(player, petId, position)
+		self:PlaceTower(player, petId, position)
+	end)
+
+	print("[TowerDefenseManager] Initialized successfully!")
+end
+
+-- Start a new wave
+function TowerDefenseManager:StartWave(player)
+	local playerData = DataManager:GetData(player)
+	if not playerData then return end
+
+	-- Initialize game state if not exists
+	if not self.ActiveGames[player.UserId] then
+		self.ActiveGames[player.UserId] = {
+			CurrentWave = 0,
+			Health = Config.TD_BASE_HEALTH,
+			PlacedTowers = {},
+			ActiveEnemies = {},
+			IsWaveActive = false
+		}
+	end
+
+	local gameState = self.ActiveGames[player.UserId]
+
+	if gameState.IsWaveActive then
+		return -- Already in a wave
+	end
+
+	-- Start next wave
+	gameState.CurrentWave += 1
+	gameState.IsWaveActive = true
+
+	ReplicatedStorage.Remotes.WaveStarted:FireClient(player, gameState.CurrentWave)
+
+	-- Spawn enemies
+	task.spawn(function()
+		self:SpawnWaveEnemies(player, gameState.CurrentWave)
+	end)
+end
+
+-- Spawn enemies for current wave
+function TowerDefenseManager:SpawnWaveEnemies(player, waveNumber)
+	local gameState = self.ActiveGames[player.UserId]
+	if not gameState then return end
+
+	-- Use ProceduralEnemyGenerator to create wave enemies
+	local enemies = ProceduralEnemyGenerator:GenerateWave(waveNumber)
+
+	-- Ensure Enemies folder exists
+	local enemiesFolder = workspace:FindFirstChild("Enemies")
+	if not enemiesFolder then
+		enemiesFolder = Instance.new("Folder")
+		enemiesFolder.Name = "Enemies"
+		enemiesFolder.Parent = workspace
+	end
+
+	for i, enemyModel in ipairs(enemies) do
+		if not gameState.IsWaveActive then break end
+
+		-- Get enemy data from model attributes
+		local enemyId = game:GetService("HttpService"):GenerateGUID(false)
+		local primaryPart = enemyModel.PrimaryPart
+
+		if primaryPart then
+			-- Position enemy at spawn point
+			local spawnPosition = Vector3.new(-50, 5, 0) -- TD spawn point
+			enemyModel:SetPrimaryPartCFrame(CFrame.new(spawnPosition))
+			enemyModel.Name = "Enemy_" .. enemyId
+			enemyModel.Parent = enemiesFolder
+
+			-- Create enemy data structure
+			local enemy = {
+				Id = enemyId,
+				Model = enemyModel,
+				Health = primaryPart:GetAttribute("Health"),
+				MaxHealth = primaryPart:GetAttribute("MaxHealth"),
+				Speed = primaryPart:GetAttribute("Speed"),
+				Reward = primaryPart:GetAttribute("Reward"),
+				Position = 0 -- Path position
+			}
+
+			table.insert(gameState.ActiveEnemies, enemy)
+
+			-- Notify client
+			ReplicatedStorage.Remotes.EnemySpawned:FireClient(player, enemy)
+
+			-- Enemy movement
+			task.spawn(function()
+				self:MoveEnemy(player, enemy)
+			end)
+		end
+
+		task.wait(1) -- Spawn delay
+	end
+end
+
+-- Move enemy along path
+function TowerDefenseManager:MoveEnemy(player, enemy)
+	local gameState = self.ActiveGames[player.UserId]
+	if not gameState then return end
+
+	while enemy.Health > 0 and gameState.IsWaveActive do
+		task.wait(0.1)
+
+		-- Move enemy forward
+		enemy.Position += enemy.Speed * 0.1
+
+		-- Check if reached end
+		if enemy.Position >= Config.TD_PATH_LENGTH then
+			-- Damage base
+			gameState.Health -= 1
+
+			if gameState.Health <= 0 then
+				self:GameOver(player, false)
+			end
+
+			-- Remove enemy
+			self:RemoveEnemy(player, enemy.Id)
+			break
+		end
+
+		-- Check tower attacks
+		for _, tower in ipairs(gameState.PlacedTowers) do
+			if tower.LastAttack + tower.AttackCooldown <= tick() then
+				-- Simple range check (would use actual positions in production)
+				if math.abs(tower.Position - enemy.Position) <= tower.Range then
+					enemy.Health -= tower.Damage
+
+					-- Update visual health bar
+					if enemy.Model then
+						ProceduralEnemyGenerator:UpdateHealthBar(enemy.Model, enemy.Health, enemy.MaxHealth)
+					end
+
+					tower.LastAttack = tick()
+
+					if enemy.Health <= 0 then
+						self:EnemyDefeated(player, enemy)
+						break
+					end
+				end
+			end
+		end
+	end
+end
+
+-- Enemy defeated
+function TowerDefenseManager:EnemyDefeated(player, enemy)
+	local playerData = DataManager:GetData(player)
+	if not playerData then return end
+
+	-- Award rewards
+	DataManager:AddCurrency(player, "Coins", enemy.Reward)
+	DataManager:AddExperience(player, math.floor(enemy.Reward / 2))
+
+	playerData.TotalEnemiesDefeated += 1
+
+	-- Remove enemy
+	self:RemoveEnemy(player, enemy.Id)
+
+	-- Check if wave complete
+	self:CheckWaveComplete(player)
+end
+
+-- Remove enemy from game
+function TowerDefenseManager:RemoveEnemy(player, enemyId)
+	local gameState = self.ActiveGames[player.UserId]
+	if not gameState then return end
+
+	for i, enemy in ipairs(gameState.ActiveEnemies) do
+		if enemy.Id == enemyId then
+			-- Destroy visual model
+			if enemy.Model and enemy.Model.Parent then
+				enemy.Model:Destroy()
+			end
+
+			table.remove(gameState.ActiveEnemies, i)
+			ReplicatedStorage.Remotes.EnemyRemoved:FireClient(player, enemyId)
+			break
+		end
+	end
+end
+
+-- Check if wave is complete
+function TowerDefenseManager:CheckWaveComplete(player)
+	local gameState = self.ActiveGames[player.UserId]
+	if not gameState then return end
+
+	if #gameState.ActiveEnemies == 0 and gameState.IsWaveActive then
+		gameState.IsWaveActive = false
+
+		local playerData = DataManager:GetData(player)
+		if playerData and gameState.CurrentWave > playerData.HighestWave then
+			playerData.HighestWave = gameState.CurrentWave
+		end
+
+		-- Award wave completion bonus
+		local bonus = gameState.CurrentWave * 100
+		DataManager:AddCurrency(player, "Coins", bonus)
+
+		ReplicatedStorage.Remotes.WaveComplete:FireClient(player, gameState.CurrentWave, bonus)
+	end
+end
+
+-- Place pet as tower
+function TowerDefenseManager:PlaceTower(player, petId, position)
+	local playerData = DataManager:GetData(player)
+	if not playerData then return end
+
+	local gameState = self.ActiveGames[player.UserId]
+	if not gameState then return end
+
+	-- Find pet
+	local petData = nil
+	for _, pet in ipairs(playerData.Pets) do
+		if pet.Id == petId then
+			petData = pet
+			break
+		end
+	end
+
+	if not petData then return end
+
+	-- Create tower from pet
+	local tower = {
+		PetId = petId,
+		Position = position,
+		Damage = 10 * petData.PowerMultiplier * petData.Level,
+		Range = 20,
+		AttackCooldown = 1,
+		LastAttack = 0
+	}
+
+	table.insert(gameState.PlacedTowers, tower)
+
+	ReplicatedStorage.Remotes.TowerPlaced:FireClient(player, tower)
+end
+
+-- Game over
+function TowerDefenseManager:GameOver(player, victory)
+	local gameState = self.ActiveGames[player.UserId]
+	if not gameState then return end
+
+	gameState.IsWaveActive = false
+	gameState.ActiveEnemies = {}
+
+	ReplicatedStorage.Remotes.GameOver:FireClient(player, victory, gameState.CurrentWave)
+end
+
+return TowerDefenseManager
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBX095634F44AF04619BDBD1FD48A3F9A2F">
+		<Properties>
+			<string name="Name">PetSystem</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	PetSystem - Manages pet hatching, evolution, abilities, and equipped pets
+	Core feature of the game combining collection and progression
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+
+local DataManager = require(ServerScriptService.Modules.DataManager)
+local SecurityManager = require(ServerScriptService.Modules.SecurityManager)
+local ProceduralPetGenerator = require(ServerScriptService.Modules.ProceduralPetGenerator)
+local Config = require(ReplicatedStorage.Shared.Config)
+local PetData = require(ReplicatedStorage.Shared.PetData)
+
+local PetSystem = {}
+PetSystem.ActivePets = {} -- Tracks spawned pets in workspace
+
+-- Pet rarity chances (legendary requires gems or special eggs)
+local RARITY_WEIGHTS = {
+	Common = 50,
+	Uncommon = 30,
+	Rare = 15,
+	Epic = 4,
+	Legendary = 1
+}
+
+function PetSystem:Initialize()
+	print("[PetSystem] Initializing...")
+
+	-- Setup remote functions
+	local hatchEggRemote = ReplicatedStorage.Remotes.HatchEgg
+	hatchEggRemote.OnServerEvent:Connect(function(player, eggType)
+		self:HatchEgg(player, eggType)
+	end)
+
+	local equipPetRemote = ReplicatedStorage.Remotes.EquipPet
+	equipPetRemote.OnServerEvent:Connect(function(player, petId)
+		self:EquipPet(player, petId)
+	end)
+
+	local unequipPetRemote = ReplicatedStorage.Remotes.UnequipPet
+	unequipPetRemote.OnServerEvent:Connect(function(player, petId)
+		self:UnequipPet(player, petId)
+	end)
+
+	local evolveRemote = ReplicatedStorage.Remotes.EvolvePet
+	evolveRemote.OnServerEvent:Connect(function(player, petId)
+		self:EvolvePet(player, petId)
+	end)
+
+	print("[PetSystem] Initialized successfully!")
+end
+
+function PetSystem:SetupPlayer(player, playerData)
+	-- Initialize pet tracking for player
+	self.ActivePets[player.UserId] = {}
+
+	-- Spawn equipped pets
+	for _, petId in ipairs(playerData.EquippedPets) do
+		self:SpawnPet(player, petId)
+	end
+end
+
+-- Weighted random selection
+local function selectByWeight(weights)
+	local totalWeight = 0
+	for _, weight in pairs(weights) do
+		totalWeight += weight
+	end
+
+	local random = math.random() * totalWeight
+	local currentWeight = 0
+
+	for rarity, weight in pairs(weights) do
+		currentWeight += weight
+		if random <= currentWeight then
+			return rarity
+		end
+	end
+
+	return "Common"
+end
+
+-- Generate unique pet ID
+local function generatePetId()
+	return game:GetService("HttpService"):GenerateGUID(false)
+end
+
+-- Hatch egg and give player a pet
+function PetSystem:HatchEgg(player, eggType)
+	-- 2025 Security: Rate limiting to prevent exploit spam
+	local canProceed, errorMsg = SecurityManager:CheckRateLimit(player, "HatchEgg")
+	if not canProceed then
+		ReplicatedStorage.Remotes.HatchResult:FireClient(player, false, errorMsg)
+		return
+	end
+
+	-- 2025 Security: Validate input type
+	if type(eggType) ~= "string" then
+		SecurityManager:LogSuspiciousActivity(player, "HatchEgg", "Invalid egg type parameter")
+		return
+	end
+
+	local eggConfig = Config.EGGS[eggType]
+	if not eggConfig then
+		warn("[PetSystem] Invalid egg type:", eggType)
+		return
+	end
+
+	-- Check if player has enough currency
+	local playerData = DataManager:GetData(player)
+	if not playerData then return end
+
+	local currencyType = eggConfig.CostType
+	local cost = eggConfig.Cost
+
+	if playerData[currencyType] < cost then
+		-- Not enough currency
+		ReplicatedStorage.Remotes.HatchResult:FireClient(player, false, "Not enough " .. currencyType)
+		return
+	end
+
+	-- Deduct currency
+	DataManager:RemoveCurrency(player, currencyType, cost)
+
+	-- Determine rarity
+	local rarity = selectByWeight(RARITY_WEIGHTS)
+
+	-- Select random pet from egg pool with matching rarity
+	local possiblePets = {}
+	for petName, petInfo in pairs(PetData) do
+		if petInfo.Rarity == rarity and table.find(eggConfig.PetPool, petName) then
+			table.insert(possiblePets, petName)
+		end
+	end
+
+	-- Fallback if no pets match
+	if #possiblePets == 0 then
+		for petName, _ in pairs(PetData) do
+			if table.find(eggConfig.PetPool, petName) then
+				table.insert(possiblePets, petName)
+			end
+		end
+	end
+
+	local petName = possiblePets[math.random(1, #possiblePets)]
+	local petInfo = PetData[petName]
+
+	-- Create pet instance
+	local petId = generatePetId()
+	local newPet = {
+		Id = petId,
+		Name = petName,
+		Rarity = petInfo.Rarity,
+		Level = 1,
+		Experience = 0,
+		PowerMultiplier = 1.0,
+		Shiny = math.random(1, 1000) <= 1, -- 0.1% shiny chance
+		HatchTime = os.time()
+	}
+
+	-- Add pet to player data
+	table.insert(playerData.Pets, newPet)
+	playerData.TotalPetsHatched += 1
+
+	-- Fire result to client
+	ReplicatedStorage.Remotes.HatchResult:FireClient(player, true, newPet)
+
+	print(string.format("[PetSystem] %s hatched %s (%s) - ID: %s",
+		player.Name, petName, petInfo.Rarity, petId))
+
+	return newPet
+end
+
+-- Equip pet to follow player
+function PetSystem:EquipPet(player, petId)
+	-- 2025 Security: Rate limiting
+	local canProceed, errorMsg = SecurityManager:CheckRateLimit(player, "EquipPet")
+	if not canProceed then
+		ReplicatedStorage.Remotes.EquipResult:FireClient(player, false, errorMsg)
+		return
+	end
+
+	-- 2025 Security: Validate input
+	if type(petId) ~= "string" then
+		SecurityManager:LogSuspiciousActivity(player, "EquipPet", "Invalid petId parameter type")
+		return
+	end
+
+	local playerData = DataManager:GetData(player)
+	if not playerData then return end
+
+	-- Check if pet exists and belongs to player
+	local petData = nil
+	for _, pet in ipairs(playerData.Pets) do
+		if pet.Id == petId then
+			petData = pet
+			break
+		end
+	end
+
+	if not petData then
+		-- 2025 Security: Log attempt to equip pet they don't own
+		SecurityManager:LogSuspiciousActivity(player, "EquipPet", "Attempted to equip pet they don't own")
+		warn("[PetSystem] Pet not found:", petId)
+		return
+	end
+
+	-- Check max equipped limit
+	if #playerData.EquippedPets >= Config.MAX_EQUIPPED_PETS then
+		ReplicatedStorage.Remotes.EquipResult:FireClient(player, false, "Maximum pets equipped")
+		return
+	end
+
+	-- Check if already equipped
+	if table.find(playerData.EquippedPets, petId) then
+		return
+	end
+
+	-- Equip pet
+	table.insert(playerData.EquippedPets, petId)
+
+	-- Spawn pet in world
+	self:SpawnPet(player, petId)
+
+	ReplicatedStorage.Remotes.EquipResult:FireClient(player, true, petId)
+end
+
+-- Unequip pet
+function PetSystem:UnequipPet(player, petId)
+	local playerData = DataManager:GetData(player)
+	if not playerData then return end
+
+	local index = table.find(playerData.EquippedPets, petId)
+	if index then
+		table.remove(playerData.EquippedPets, index)
+
+		-- Despawn pet
+		self:DespawnPet(player, petId)
+
+		ReplicatedStorage.Remotes.UnequipResult:FireClient(player, true, petId)
+	end
+end
+
+-- Spawn pet model in workspace
+function PetSystem:SpawnPet(player, petId)
+	local playerData = DataManager:GetData(player)
+	if not playerData then return end
+
+	local petData = nil
+	for _, pet in ipairs(playerData.Pets) do
+		if pet.Id == petId then
+			petData = pet
+			break
+		end
+	end
+
+	if not petData then return end
+
+	local character = player.Character
+	if not character then return end
+
+	-- Create pet model using ProceduralPetGenerator (NO mesh IDs!)
+	local petInfo = PetData[petData.Name]
+	local petModel = ProceduralPetGenerator:GeneratePet(petData.Name, petData.Rarity, petData.Shiny)
+
+	if not petModel then
+		warn("[PetSystem] Failed to generate pet model for:", petData.Name)
+		return
+	end
+
+	petModel.Name = "Pet_" .. petId
+
+	-- Get or create the primary part for movement
+	local primaryPart = petModel.PrimaryPart or petModel:FindFirstChildOfClass("Part")
+	if not primaryPart then
+		warn("[PetSystem] Pet model has no valid parts!")
+		return
+	end
+
+	-- Add floating effect to primary part
+	local bodyPosition = Instance.new("BodyPosition")
+	bodyPosition.MaxForce = Vector3.new(50000, 50000, 50000)
+	bodyPosition.Parent = primaryPart
+
+	local bodyGyro = Instance.new("BodyGyro")
+	bodyGyro.MaxTorque = Vector3.new(5000, 5000, 5000)
+	bodyGyro.Parent = primaryPart
+
+	-- Ensure Pets folder exists
+	local petsFolder = workspace:FindFirstChild("Pets")
+	if not petsFolder then
+		petsFolder = Instance.new("Folder")
+		petsFolder.Name = "Pets"
+		petsFolder.Parent = workspace
+	end
+
+	petModel.Parent = petsFolder
+
+	-- Store reference
+	if not self.ActivePets[player.UserId] then
+		self.ActivePets[player.UserId] = {}
+	end
+	self.ActivePets[player.UserId][petId] = {
+		Model = petModel,
+		PrimaryPart = primaryPart,
+		Data = petData,
+		BodyPosition = bodyPosition,
+		BodyGyro = bodyGyro
+	}
+
+	-- Start follow loop
+	task.spawn(function()
+		self:PetFollowLoop(player, petId)
+	end)
+end
+
+-- Despawn pet model
+function PetSystem:DespawnPet(player, petId)
+	if self.ActivePets[player.UserId] and self.ActivePets[player.UserId][petId] then
+		local petInfo = self.ActivePets[player.UserId][petId]
+		if petInfo.Model then
+			petInfo.Model:Destroy()
+		end
+		self.ActivePets[player.UserId][petId] = nil
+	end
+end
+
+-- Pet follow behavior
+function PetSystem:PetFollowLoop(player, petId)
+	while true do
+		task.wait(0.1)
+
+		if not self.ActivePets[player.UserId] or not self.ActivePets[player.UserId][petId] then
+			break
+		end
+
+		local petInfo = self.ActivePets[player.UserId][petId]
+		local character = player.Character
+		local humanoidRootPart = character and character:FindFirstChild("HumanoidRootPart")
+
+		if not humanoidRootPart or not petInfo.Model then
+			break
+		end
+
+		-- Calculate follow position with offset
+		local equippedPets = DataManager:GetData(player).EquippedPets
+		local petIndex = table.find(equippedPets, petId) or 1
+		local angle = (petIndex - 1) * (math.pi * 2 / #equippedPets)
+		local radius = 4
+
+		local offsetX = math.cos(angle + tick()) * radius
+		local offsetZ = math.sin(angle + tick()) * radius
+		local offsetY = math.sin(tick() * 2) * 0.5 + 3
+
+		local targetPosition = humanoidRootPart.Position + Vector3.new(offsetX, offsetY, offsetZ)
+
+		-- Update position (using PrimaryPart for multi-part models)
+		local petPart = petInfo.PrimaryPart or petInfo.Model
+		petInfo.BodyPosition.Position = targetPosition
+		petInfo.BodyGyro.CFrame = CFrame.new(petPart.Position, humanoidRootPart.Position)
+	end
+end
+
+-- Evolve pet (increase power)
+function PetSystem:EvolvePet(player, petId)
+	local playerData = DataManager:GetData(player)
+	if not playerData then return end
+
+	local petData = nil
+	for _, pet in ipairs(playerData.Pets) do
+		if pet.Id == petId then
+			petData = pet
+			break
+		end
+	end
+
+	if not petData then return end
+
+	-- Check evolution requirements
+	local evolutionCost = petData.PowerMultiplier * 1000
+	if playerData.Coins < evolutionCost then
+		ReplicatedStorage.Remotes.EvolveResult:FireClient(player, false, "Not enough Coins")
+		return
+	end
+
+	-- Deduct cost and evolve
+	DataManager:RemoveCurrency(player, "Coins", evolutionCost)
+	petData.PowerMultiplier += 0.1
+
+	ReplicatedStorage.Remotes.EvolveResult:FireClient(player, true, petData)
+end
+
+return PetSystem
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBX29835F30E23C4CF8B07801488D22CAB1">
+		<Properties>
+			<string name="Name">DataManager</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	DataManager - Handles all player data storage and retrieval using DataStore2
+	Manages player progression, pets, currency, and statistics
+]]
+
+local DataStoreService = game:GetService("DataStoreService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Config = require(ReplicatedStorage.Shared.Config)
+
+local DataManager = {}
+DataManager.PlayerData = {} -- In-memory cache of player data
+
+-- Default player data structure
+local DEFAULT_DATA = {
+	-- Currency
+	Coins = 1000,
+	Gems = 50,
+
+	-- Pets
+	Pets = {},
+	EquippedPets = {},
+
+	-- Progression
+	Level = 1,
+	Experience = 0,
+	TotalPlayTime = 0,
+
+	-- Tycoon
+	TycoonLevel = 1,
+	UnlockedBuildings = {},
+
+	-- Tower Defense
+	HighestWave = 0,
+	TotalEnemiesDefeated = 0,
+
+	-- Obby
+	CompletedObbies = {},
+	BestObbyTimes = {},
+
+	-- Statistics
+	TotalPetsHatched = 0,
+	TotalTradesCompleted = 0,
+	LoginStreak = 0,
+	LastLogin = 0,
+
+	-- Settings
+	Settings = {
+		MusicEnabled = true,
+		SFXEnabled = true,
+		ParticlesEnabled = true,
+		MobileMode = false
+	}
+}
+
+-- DataStore instances
+local PlayerDataStore
+local BackupDataStore
+
+function DataManager:Initialize()
+	print("[DataManager] Initializing...")
+
+	-- DataStore Version Management (2025 Best Practices)
+	-- IMPORTANT: Use different versions for Testing vs Production!
+	--
+	-- FOR TESTING (in Studio):
+	-- PlayerDataStore = DataStoreService:GetDataStore("PlayerData_TEST_V1")
+	-- BackupDataStore = DataStoreService:GetDataStore("PlayerDataBackup_TEST_V1")
+	--
+	-- FOR PRODUCTION (published game):
+	-- PlayerDataStore = DataStoreService:GetDataStore("PlayerData_PROD_V1")
+	-- BackupDataStore = DataStoreService:GetDataStore("PlayerDataBackup_PROD_V1")
+	--
+	-- Version Increment Rules:
+	-- - Change data structure? Increment version (V1 → V2)
+	-- - Add new fields? Keep same version (backward compatible)
+	-- - Major update? New version to avoid conflicts
+	-- - Never mix test and production data!
+	--
+	-- 2025 DataStore Updates:
+	-- - Creator Hub now has DataStore Manager (view/compare versions)
+	-- - Session locking prevents concurrent edits
+	-- - Use UpdateAsync for atomic operations
+
+	-- Initialize DataStores
+	local success, err = pcall(function()
+		-- PRODUCTION VERSION - Change before publishing!
+		PlayerDataStore = DataStoreService:GetDataStore("PlayerData_PROD_V1")
+		BackupDataStore = DataStoreService:GetDataStore("PlayerDataBackup_PROD_V1")
+
+		-- For testing, use: PlayerData_TEST_V1
+		-- NEVER use the same name for both test and production!
+	end)
+
+	if not success then
+		warn("[DataManager] Failed to initialize DataStores:", err)
+		warn("[DataManager] Running in offline mode - data will not persist!")
+		warn("[DataManager] Enable 'Studio Access to API Services' in Game Settings")
+	end
+
+	print("[DataManager] DataStore Version: PROD_V1")
+	print("[DataManager] Initialized successfully!")
+end
+
+-- Deep copy table
+local function deepCopy(original)
+	local copy = {}
+	for key, value in pairs(original) do
+		if type(value) == "table" then
+			copy[key] = deepCopy(value)
+		else
+			copy[key] = value
+		end
+	end
+	return copy
+end
+
+-- Load player data from DataStore
+function DataManager:LoadPlayerData(player)
+	local userId = player.UserId
+	local dataKey = "Player_" .. userId
+
+	print("[DataManager] Loading data for:", player.Name)
+
+	-- Start with default data
+	local playerData = deepCopy(DEFAULT_DATA)
+
+	-- Try to load from DataStore
+	if PlayerDataStore then
+		local success, savedData = pcall(function()
+			return PlayerDataStore:GetAsync(dataKey)
+		end)
+
+		if success and savedData then
+			-- Merge saved data with defaults (in case new fields were added)
+			for key, value in pairs(savedData) do
+				playerData[key] = value
+			end
+			print("[DataManager] Loaded existing data for:", player.Name)
+		else
+			print("[DataManager] No existing data found, using defaults for:", player.Name)
+		end
+	end
+
+	-- Update login stats
+	local currentTime = os.time()
+	local daysSinceLastLogin = math.floor((currentTime - playerData.LastLogin) / 86400)
+
+	if daysSinceLastLogin == 1 then
+		playerData.LoginStreak += 1
+	elseif daysSinceLastLogin > 1 then
+		playerData.LoginStreak = 1
+	end
+
+	playerData.LastLogin = currentTime
+
+	-- Cache in memory
+	self.PlayerData[userId] = playerData
+
+	return true, playerData
+end
+
+-- Save player data to DataStore
+function DataManager:SavePlayerData(player)
+	local userId = player.UserId
+	local dataKey = "Player_" .. userId
+
+	local playerData = self.PlayerData[userId]
+	if not playerData then
+		warn("[DataManager] No data to save for:", player.Name)
+		return false
+	end
+
+	print("[DataManager] Saving data for:", player.Name)
+
+	if PlayerDataStore then
+		local success, err = pcall(function()
+			PlayerDataStore:SetAsync(dataKey, playerData)
+		end)
+
+		if success then
+			print("[DataManager] Successfully saved data for:", player.Name)
+
+			-- Also save to backup
+			pcall(function()
+				BackupDataStore:SetAsync(dataKey, playerData)
+			end)
+
+			return true
+		else
+			warn("[DataManager] Failed to save data for:", player.Name, err)
+			return false
+		end
+	end
+
+	return false
+end
+
+-- Get player data
+function DataManager:GetData(player)
+	return self.PlayerData[player.UserId]
+end
+
+-- Update player data
+function DataManager:UpdateData(player, key, value)
+	local data = self.PlayerData[player.UserId]
+	if data then
+		data[key] = value
+		return true
+	end
+	return false
+end
+
+-- Add currency
+function DataManager:AddCurrency(player, currencyType, amount)
+	local data = self.PlayerData[player.UserId]
+	if data and data[currencyType] then
+		data[currencyType] += amount
+
+		-- Fire client update event
+		local remoteEvent = ReplicatedStorage.Remotes.UpdateCurrency
+		if remoteEvent then
+			remoteEvent:FireClient(player, currencyType, data[currencyType])
+		end
+
+		return true
+	end
+	return false
+end
+
+-- Remove currency
+function DataManager:RemoveCurrency(player, currencyType, amount)
+	local data = self.PlayerData[player.UserId]
+	if data and data[currencyType] and data[currencyType] >= amount then
+		data[currencyType] -= amount
+
+		-- Fire client update event
+		local remoteEvent = ReplicatedStorage.Remotes.UpdateCurrency
+		if remoteEvent then
+			remoteEvent:FireClient(player, currencyType, data[currencyType])
+		end
+
+		return true
+	end
+	return false
+end
+
+-- Add experience
+function DataManager:AddExperience(player, amount)
+	local data = self.PlayerData[player.UserId]
+	if not data then return false end
+
+	data.Experience += amount
+
+	-- Check for level up
+	local expNeeded = Config.LEVEL_EXPERIENCE_FORMULA(data.Level)
+	while data.Experience >= expNeeded do
+		data.Experience -= expNeeded
+		data.Level += 1
+
+		-- Award level up rewards
+		self:AddCurrency(player, "Coins", data.Level * 100)
+		self:AddCurrency(player, "Gems", math.floor(data.Level / 5))
+
+		-- Fire level up event
+		local remoteEvent = ReplicatedStorage.Remotes.LevelUp
+		if remoteEvent then
+			remoteEvent:FireClient(player, data.Level)
+		end
+
+		expNeeded = Config.LEVEL_EXPERIENCE_FORMULA(data.Level)
+	end
+
+	return true
+end
+
+return DataManager
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBX70DB8AE892874F4FA9B9585D667CBA81">
+		<Properties>
+			<string name="Name">SecurityManager</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	SecurityManager - 2025 Anti-Exploit & Rate Limiting System
+	Implements "Never Trust the Client" principle and prevents common exploits
+]]
+
+local Players = game:GetService("Players")
+
+local SecurityManager = {}
+SecurityManager.RateLimits = {} -- Track rate limits per player
+SecurityManager.SuspiciousActivity = {} -- Track suspicious behavior
+
+-- Rate limit configuration (requests per second)
+local RATE_LIMITS = {
+	HatchEgg = 2, -- Max 2 egg hatches per second
+	EquipPet = 5, -- Max 5 equip changes per second
+	PurchaseBuilding = 3,
+	StartWave = 1,
+	Trade = 1,
+	CompleteObby = 1
+}
+
+-- Initialize security system
+function SecurityManager:Initialize()
+	print("[SecurityManager] Initializing 2025 security measures...")
+
+	-- Clean up disconnected players
+	Players.PlayerRemoving:Connect(function(player)
+		self:CleanupPlayer(player)
+	end)
+
+	print("[SecurityManager] Security initialized!")
+end
+
+-- Check if action is rate limited
+function SecurityManager:CheckRateLimit(player, actionType)
+	local userId = player.UserId
+	local currentTime = tick()
+
+	-- Initialize tracking for player if needed
+	if not self.RateLimits[userId] then
+		self.RateLimits[userId] = {}
+	end
+
+	if not self.RateLimits[userId][actionType] then
+		self.RateLimits[userId][actionType] = {
+			Count = 0,
+			ResetTime = currentTime + 1
+		}
+	end
+
+	local limit = self.RateLimits[userId][actionType]
+
+	-- Reset counter if time window passed
+	if currentTime >= limit.ResetTime then
+		limit.Count = 0
+		limit.ResetTime = currentTime + 1
+	end
+
+	-- Check if limit exceeded
+	local maxAllowed = RATE_LIMITS[actionType] or 10
+	if limit.Count >= maxAllowed then
+		self:LogSuspiciousActivity(player, actionType, "Rate limit exceeded")
+		return false, "Too many requests. Please wait a moment."
+	end
+
+	-- Increment counter
+	limit.Count += 1
+	return true, nil
+end
+
+-- Validate currency amount (prevent negative/NaN exploits)
+function SecurityManager:ValidateCurrency(amount, currencyType)
+	-- Check if number
+	if type(amount) ~= "number" then
+		return false, "Invalid currency type"
+	end
+
+	-- Check for NaN
+	if amount ~= amount then
+		return false, "Invalid currency value (NaN)"
+	end
+
+	-- Check for negative
+	if amount < 0 then
+		return false, "Currency cannot be negative"
+	end
+
+	-- Check for infinity
+	if amount == math.huge or amount == -math.huge then
+		return false, "Invalid currency value (infinity)"
+	end
+
+	-- Check for unreasonably large amounts (likely exploit)
+	local MAX_CURRENCY = currencyType == "Gems" and 1000000 or 100000000
+	if amount > MAX_CURRENCY then
+		return false, "Currency amount exceeds maximum"
+	end
+
+	return true, nil
+end
+
+-- Validate pet data structure
+function SecurityManager:ValidatePetData(petData)
+	-- Check required fields
+	local requiredFields = {"Id", "Name", "Rarity", "Level", "PowerMultiplier"}
+	for _, field in ipairs(requiredFields) do
+		if petData[field] == nil then
+			return false, "Missing required field: " .. field
+		end
+	end
+
+	-- Validate level (1-100 reasonable range)
+	if type(petData.Level) ~= "number" or petData.Level < 1 or petData.Level > 100 then
+		return false, "Invalid pet level"
+	end
+
+	-- Validate PowerMultiplier (1.0-10.0 reasonable range)
+	if type(petData.PowerMultiplier) ~= "number" or petData.PowerMultiplier < 1 or petData.PowerMultiplier > 10 then
+		return false, "Invalid pet power multiplier"
+	end
+
+	-- Validate rarity
+	local validRarities = {Common = true, Uncommon = true, Rare = true, Epic = true, Legendary = true}
+	if not validRarities[petData.Rarity] then
+		return false, "Invalid pet rarity"
+	end
+
+	return true, nil
+end
+
+-- Validate player data integrity
+function SecurityManager:ValidatePlayerData(playerData)
+	if type(playerData) ~= "table" then
+		return false, "Player data must be a table"
+	end
+
+	-- Validate currency
+	local valid, err = self:ValidateCurrency(playerData.Coins or 0, "Coins")
+	if not valid then return false, "Coins: " .. err end
+
+	valid, err = self:ValidateCurrency(playerData.Gems or 0, "Gems")
+	if not valid then return false, "Gems: " .. err end
+
+	-- Validate level
+	if type(playerData.Level) ~= "number" or playerData.Level < 1 or playerData.Level > 1000 then
+		return false, "Invalid player level"
+	end
+
+	-- Validate pets array
+	if playerData.Pets and type(playerData.Pets) ~= "table" then
+		return false, "Pets must be an array"
+	end
+
+	return true, nil
+end
+
+-- Log suspicious activity
+function SecurityManager:LogSuspiciousActivity(player, action, reason)
+	local userId = player.UserId
+
+	if not self.SuspiciousActivity[userId] then
+		self.SuspiciousActivity[userId] = {}
+	end
+
+	table.insert(self.SuspiciousActivity[userId], {
+		Action = action,
+		Reason = reason,
+		Time = os.time(),
+		PlayerName = player.Name
+	})
+
+	warn(string.format("[SecurityManager] Suspicious activity: %s | Player: %s (%d) | Action: %s | Reason: %s",
+		os.date("%Y-%m-%d %H:%M:%S"),
+		player.Name,
+		userId,
+		action,
+		reason
+	))
+
+	-- Auto-kick if too many violations (10+ in 5 minutes)
+	local recentViolations = 0
+	local fiveMinutesAgo = os.time() - 300
+
+	for _, violation in ipairs(self.SuspiciousActivity[userId]) do
+		if violation.Time >= fiveMinutesAgo then
+			recentViolations += 1
+		end
+	end
+
+	if recentViolations >= 10 then
+		player:Kick("Suspicious activity detected. Please contact support if this was an error.")
+		warn(string.format("[SecurityManager] Player kicked for excessive violations: %s (%d)", player.Name, userId))
+	end
+end
+
+-- Sanitize string input (prevent injection attacks)
+function SecurityManager:SanitizeString(input, maxLength)
+	if type(input) ~= "string" then
+		return ""
+	end
+
+	maxLength = maxLength or 100
+
+	-- Truncate
+	if #input > maxLength then
+		input = string.sub(input, 1, maxLength)
+	end
+
+	-- Remove potentially dangerous characters
+	input = string.gsub(input, "[<>\"']", "")
+
+	return input
+end
+
+-- Validate position (prevent teleport exploits)
+function SecurityManager:ValidatePosition(player, position)
+	if typeof(position) ~= "Vector3" then
+		return false, "Invalid position type"
+	end
+
+	-- Check for NaN/Inf
+	if position.X ~= position.X or position.Y ~= position.Y or position.Z ~= position.Z then
+		return false, "Position contains NaN"
+	end
+
+	if math.abs(position.X) == math.huge or math.abs(position.Y) == math.huge or math.abs(position.Z) == math.huge then
+		return false, "Position contains infinity"
+	end
+
+	-- Check if position is unreasonably far (likely teleport exploit)
+	local character = player.Character
+	if character and character:FindFirstChild("HumanoidRootPart") then
+		local distance = (character.HumanoidRootPart.Position - position).Magnitude
+		if distance > 1000 then -- More than 1000 studs is suspicious
+			self:LogSuspiciousActivity(player, "ValidatePosition", "Position too far from player")
+			return false, "Position too far from current location"
+		end
+	end
+
+	return true, nil
+end
+
+-- Cleanup player data
+function SecurityManager:CleanupPlayer(player)
+	local userId = player.UserId
+	self.RateLimits[userId] = nil
+	self.SuspiciousActivity[userId] = nil
+end
+
+-- Get player's violation count
+function SecurityManager:GetViolationCount(player)
+	local userId = player.UserId
+	if not self.SuspiciousActivity[userId] then
+		return 0
+	end
+	return #self.SuspiciousActivity[userId]
+end
+
+return SecurityManager
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="Script" referent="RBXD1A0191A9836483E8A799B7D20DD9A89">
+		<Properties>
+			<string name="Name">MainServer</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	Pet Kingdom Defenders - Main Server Script
+	Initializes all server-side systems and manages game state
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+local Players = game:GetService("Players")
+
+-- Server Modules
+local SecurityManager = require(ServerScriptService.Modules.SecurityManager) -- 2025: Initialize first for security
+local DataManager = require(ServerScriptService.Modules.DataManager)
+local PetSystem = require(ServerScriptService.Modules.PetSystem)
+local TowerDefenseManager = require(ServerScriptService.Modules.TowerDefenseManager)
+local TycoonManager = require(ServerScriptService.Modules.TycoonManager)
+local EconomyManager = require(ServerScriptService.Modules.EconomyManager)
+local TradingSystem = require(ServerScriptService.Modules.TradingSystem)
+local ObbyManager = require(ServerScriptService.Modules.ObbyManager)
+local EventManager = require(ServerScriptService.Modules.EventManager)
+
+-- Shared Modules
+local Config = require(ReplicatedStorage.Shared.Config)
+local Utils = require(ReplicatedStorage.Shared.Utils)
+
+print("[Server] Pet Kingdom Defenders - Initializing...")
+
+-- Initialize all systems
+local function initializeSystems()
+	SecurityManager:Initialize() -- 2025: Initialize security first
+	DataManager:Initialize()
+	PetSystem:Initialize()
+	TowerDefenseManager:Initialize()
+	TycoonManager:Initialize()
+	EconomyManager:Initialize()
+	TradingSystem:Initialize()
+	ObbyManager:Initialize()
+	EventManager:Initialize()
+
+	print("[Server] All systems initialized successfully!")
+end
+
+-- Player joined handler
+local function onPlayerAdded(player)
+	print("[Server] Player joined:", player.Name)
+
+	-- Load player data
+	local success, playerData = DataManager:LoadPlayerData(player)
+
+	if success then
+		-- Initialize player systems
+		PetSystem:SetupPlayer(player, playerData)
+		TycoonManager:SetupPlayerBase(player, playerData)
+		EconomyManager:SetupPlayerEconomy(player, playerData)
+
+		-- Award daily bonus
+		EconomyManager:CheckDailyBonus(player)
+
+		print("[Server] Player setup complete:", player.Name)
+	else
+		player:Kick("Failed to load player data. Please rejoin.")
+	end
+end
+
+-- Player leaving handler
+local function onPlayerRemoving(player)
+	print("[Server] Player leaving:", player.Name)
+	DataManager:SavePlayerData(player)
+	TycoonManager:CleanupPlayerBase(player)
+	TradingSystem:CancelActiveTrades(player)
+end
+
+-- Server shutdown handler
+local function onServerShutdown()
+	print("[Server] Server shutting down - Saving all player data...")
+	for _, player in ipairs(Players:GetPlayers()) do
+		DataManager:SavePlayerData(player)
+	end
+	print("[Server] All data saved!")
+end
+
+-- Initialize systems
+initializeSystems()
+
+-- Connect player events
+Players.PlayerAdded:Connect(onPlayerAdded)
+Players.PlayerRemoving:Connect(onPlayerRemoving)
+
+-- Handle players already in game (for testing)
+for _, player in ipairs(Players:GetPlayers()) do
+	task.spawn(onPlayerAdded, player)
+end
+
+-- Bind shutdown handler
+game:BindToClose(onServerShutdown)
+
+-- Auto-save loop (every 5 minutes)
+task.spawn(function()
+	while true do
+		task.wait(300) -- 5 minutes
+		print("[Server] Auto-saving all player data...")
+		for _, player in ipairs(Players:GetPlayers()) do
+			DataManager:SavePlayerData(player)
+		end
+	end
+end)
+
+print("[Server] Pet Kingdom Defenders is running!")
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="Script" referent="RBX3607231793C74496AD45E569CF415097">
+		<Properties>
+			<string name="Name">InitializeRemotes</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	InitializeRemotes - Initializes all remote events and functions
+	This should run before MainServer.lua
+]]
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Run the remotes setup
+local RemotesSetup = require(ReplicatedStorage.Remotes.RemotesSetup)
+
+print("[InitializeRemotes] All remotes initialized!")
+]]></ProtectedString>
+		</Properties>
+	</Item>
+			<Properties>
+				<string name="Name">Modules</string>
+			</Properties>
+			<!-- Add ModuleScripts:
+				- SecurityManager.lua
+				- DataManager.lua
+				- PetSystem.lua
+				- TowerDefenseManager.lua
+				- TycoonManager.lua
+				- EconomyManager.lua
+				- TradingSystem.lua
+				- ObbyManager.lua
+				- EventManager.lua
+			-->
+		</Item>
+
+		<!-- Server Scripts (add manually in Studio) -->
+		<!-- InitializeRemotes.lua -->
+		<!-- MainServer.lua -->
+	</Item>
+
+	<!-- STARTER PLAYER -->
+	<Item class="StarterPlayer" referent="RBXSTARTERPLAYER">
+		<Properties>
+			<string name="Name">StarterPlayer</string>
+		</Properties>
+
+		<Item class="StarterPlayerScripts" referent="RBX30">
+			<Properties>
+				<string name="Name">StarterPlayerScripts</string>
+			</Properties>
+
+			<!-- Modules Folder -->
+			<Item class="Folder" referent="RBX31">
+	<Item class="ModuleScript" referent="RBXACDA719DC52A456EA447400AA1676C28">
+		<Properties>
+			<string name="Name">NotificationManager</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	NotificationManager - Displays toast notifications to players
+	Supports different notification types (success, error, info, special)
+]]
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local NotificationManager = {}
+NotificationManager.NotificationQueue = {}
+NotificationManager.ActiveNotification = nil
+
+function NotificationManager:Initialize()
+	print("[NotificationManager] Initializing...")
+
+	-- Create notification container if it doesn't exist
+	local mainUI = playerGui:WaitForChild("MainUI", 10)
+	if mainUI then
+		self.NotificationContainer = mainUI:FindFirstChild("NotificationContainer")
+	end
+
+	print("[NotificationManager] Initialized successfully!")
+end
+
+-- Show notification
+function NotificationManager:Show(message, notificationType)
+	notificationType = notificationType or "info"
+
+	-- Add to queue
+	table.insert(self.NotificationQueue, {
+		Message = message,
+		Type = notificationType
+	})
+
+	-- Process queue if not already showing a notification
+	if not self.ActiveNotification then
+		self:ProcessQueue()
+	end
+end
+
+-- Process notification queue
+function NotificationManager:ProcessQueue()
+	if #self.NotificationQueue == 0 then
+		self.ActiveNotification = nil
+		return
+	end
+
+	local notification = table.remove(self.NotificationQueue, 1)
+	self.ActiveNotification = notification
+
+	-- Create notification UI
+	local notificationFrame = self:CreateNotificationFrame(notification)
+
+	-- Show animation
+	self:AnimateIn(notificationFrame)
+
+	-- Wait and hide
+	task.wait(3)
+
+	self:AnimateOut(notificationFrame)
+
+	-- Process next in queue
+	task.wait(0.5)
+	self:ProcessQueue()
+end
+
+-- Create notification frame
+function NotificationManager:CreateNotificationFrame(notification)
+	if not self.NotificationContainer then
+		return nil
+	end
+
+	local frame = Instance.new("Frame")
+	frame.Size = UDim2.new(0, 300, 0, 60)
+	frame.Position = UDim2.new(1, -320, 0, 20)
+	frame.BackgroundColor3 = self:GetNotificationColor(notification.Type)
+	frame.BorderSizePixel = 0
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 8)
+	corner.Parent = frame
+
+	local textLabel = Instance.new("TextLabel")
+	textLabel.Size = UDim2.new(1, -20, 1, -20)
+	textLabel.Position = UDim2.new(0, 10, 0, 10)
+	textLabel.BackgroundTransparency = 1
+	textLabel.Text = notification.Message
+	textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	textLabel.Font = Enum.Font.GothamBold
+	textLabel.TextScaled = true
+	textLabel.TextXAlignment = Enum.TextXAlignment.Left
+	textLabel.Parent = frame
+
+	frame.Parent = self.NotificationContainer
+
+	return frame
+end
+
+-- Get color based on notification type
+function NotificationManager:GetNotificationColor(notificationType)
+	local colors = {
+		success = Color3.fromRGB(50, 200, 50),
+		error = Color3.fromRGB(200, 50, 50),
+		info = Color3.fromRGB(50, 150, 250),
+		special = Color3.fromRGB(255, 200, 50)
+	}
+
+	return colors[notificationType] or colors.info
+end
+
+-- Animate notification in
+function NotificationManager:AnimateIn(frame)
+	if not frame then return end
+
+	frame.Position = UDim2.new(1, 0, 0, 20)
+
+	local tween = TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+		Position = UDim2.new(1, -320, 0, 20)
+	})
+
+	tween:Play()
+end
+
+-- Animate notification out
+function NotificationManager:AnimateOut(frame)
+	if not frame then return end
+
+	local tween = TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+		Position = UDim2.new(1, 0, 0, 20)
+	})
+
+	tween:Play()
+
+	tween.Completed:Connect(function()
+		frame:Destroy()
+	end)
+end
+
+return NotificationManager
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBX260E1937270047929A72AE7CD9D4B9FA">
+		<Properties>
+			<string name="Name">SoundManager</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	SoundManager - Manages all game audio (music, SFX)
+	Handles volume, muting, and sound playback
+]]
+
+local SoundService = game:GetService("SoundService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local SoundManager = {}
+SoundManager.Sounds = {}
+SoundManager.MusicEnabled = true
+SoundManager.SFXEnabled = true
+
+-- Sound IDs from Roblox Creator Store (100,000+ free sound effects available)
+-- HOW TO FIND FREE SOUND IDs:
+-- 1. Open Roblox Studio → Toolbox → Creator Store tab
+-- 2. Filter by: Audio
+-- 3. Search for: "level up", "achievement", "coin", "victory", etc.
+-- 4. Right-click asset → Copy Asset ID
+-- 5. Replace IDs below with your chosen sounds
+
+local SOUND_IDS = {
+	LevelUp = "rbxassetid://17119657962",      -- Free achievement sound from Creator Store
+	Achievement = "rbxassetid://17119657962",   -- Free achievement sound (same as level up)
+	PetHatch = "rbxassetid://3023237993",       -- Free notification sound
+	CoinCollect = "rbxassetid://3023237993",    -- Free notification sound (reuse)
+	ButtonClick = "rbxassetid://3023237993",    -- Free notification sound (reuse)
+	Victory = "rbxassetid://17119657962",       -- Free achievement sound (reuse)
+	Defeat = "rbxassetid://3023237993",         -- Free notification sound (reuse)
+	BackgroundMusic = "rbxassetid://1843852940" -- Free music loop (search "peaceful music" in Creator Store)
+}
+
+-- NOTE: These are working free asset IDs from Roblox Creator Store
+-- For better variety, search the Creator Store for specific sounds:
+-- - "level up sound effect"
+-- - "coin collect"
+-- - "victory fanfare"
+-- - "game over sound"
+-- All sounds under 10 seconds from verified creators are free to use!
+
+function SoundManager:Initialize()
+	print("[SoundManager] Initializing...")
+
+	-- Create sound instances
+	for soundName, soundId in pairs(SOUND_IDS) do
+		local sound = Instance.new("Sound")
+		sound.Name = soundName
+		sound.SoundId = soundId
+		sound.Volume = 0.5
+
+		if soundName == "BackgroundMusic" then
+			sound.Looped = true
+			sound.Volume = 0.3
+		end
+
+		sound.Parent = SoundService
+		self.Sounds[soundName] = sound
+	end
+
+	-- Play background music
+	if self.MusicEnabled then
+		self:PlaySound("BackgroundMusic")
+	end
+
+	print("[SoundManager] Initialized successfully!")
+end
+
+-- Play a sound
+function SoundManager:PlaySound(soundName, volume)
+	local sound = self.Sounds[soundName]
+	if not sound then
+		warn("[SoundManager] Sound not found:", soundName)
+		return
+	end
+
+	-- Check if SFX is enabled (except for music)
+	if soundName ~= "BackgroundMusic" and not self.SFXEnabled then
+		return
+	end
+
+	if soundName == "BackgroundMusic" and not self.MusicEnabled then
+		return
+	end
+
+	if volume then
+		sound.Volume = volume
+	end
+
+	sound:Play()
+end
+
+-- Stop a sound
+function SoundManager:StopSound(soundName)
+	local sound = self.Sounds[soundName]
+	if sound then
+		sound:Stop()
+	end
+end
+
+-- Toggle music
+function SoundManager:ToggleMusic()
+	self.MusicEnabled = not self.MusicEnabled
+
+	if self.MusicEnabled then
+		self:PlaySound("BackgroundMusic")
+	else
+		self:StopSound("BackgroundMusic")
+	end
+end
+
+-- Toggle SFX
+function SoundManager:ToggleSFX()
+	self.SFXEnabled = not self.SFXEnabled
+end
+
+-- Set volume for all sounds
+function SoundManager:SetMasterVolume(volume)
+	for _, sound in pairs(self.Sounds) do
+		sound.Volume = volume
+	end
+end
+
+return SoundManager
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBX1C9E2278D5B14878AB817A0DD1BB0BD2">
+		<Properties>
+			<string name="Name">CameraController</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	CameraController - Manages camera behavior and effects
+	Smooth camera transitions and cinematic moments
+]]
+
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+
+local CameraController = {}
+CameraController.CameraMode = "Default" -- Default, Cinematic, Fixed
+
+function CameraController:Initialize()
+	print("[CameraController] Initializing...")
+
+	-- Set default camera settings
+	camera.CameraType = Enum.CameraType.Custom
+
+	print("[CameraController] Initialized successfully!")
+end
+
+function CameraController:SetupCharacter(character)
+	self.Character = character
+	self.Humanoid = character:WaitForChild("Humanoid")
+	self.HumanoidRootPart = character:WaitForChild("HumanoidRootPart")
+end
+
+-- Shake camera (for impacts, explosions, etc.)
+function CameraController:Shake(intensity, duration)
+	local startTime = tick()
+
+	local connection
+	connection = RunService.RenderStepped:Connect(function()
+		local elapsed = tick() - startTime
+
+		if elapsed >= duration then
+			connection:Disconnect()
+			camera.CFrame = camera.CFrame * CFrame.new(0, 0, 0) -- Reset
+			return
+		end
+
+		local shake = Vector3.new(
+			math.random(-100, 100) / 100 * intensity,
+			math.random(-100, 100) / 100 * intensity,
+			math.random(-100, 100) / 100 * intensity
+		)
+
+		camera.CFrame = camera.CFrame * CFrame.new(shake)
+	end)
+end
+
+-- Zoom to position smoothly
+function CameraController:ZoomTo(position, duration)
+	self.CameraMode = "Cinematic"
+
+	local targetCFrame = CFrame.new(position + Vector3.new(0, 10, 10), position)
+
+	local tween = TweenService:Create(camera, TweenInfo.new(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {
+		CFrame = targetCFrame
+	})
+
+	tween:Play()
+
+	tween.Completed:Connect(function()
+		self.CameraMode = "Default"
+	end)
+end
+
+-- Set camera to follow character (reset)
+function CameraController:ResetCamera()
+	self.CameraMode = "Default"
+	camera.CameraType = Enum.CameraType.Custom
+	camera.CameraSubject = self.Humanoid
+end
+
+return CameraController
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBXAFFE6471EAAA4BDC87E576B0D86E4C5C">
+		<Properties>
+			<string name="Name">InputManager</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	InputManager - Handles all player input (keyboard, mouse, touch)
+	Mobile-optimized controls
+]]
+
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+
+local player = Players.LocalPlayer
+
+local InputManager = {}
+InputManager.InputEnabled = true
+
+function InputManager:Initialize()
+	print("[InputManager] Initializing...")
+
+	-- Detect input type
+	if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled then
+		self.IsMobile = true
+		print("[InputManager] Mobile controls enabled")
+	else
+		self.IsMobile = false
+		print("[InputManager] Desktop controls enabled")
+	end
+
+	-- Setup input listeners
+	UserInputService.InputBegan:Connect(function(input, gameProcessed)
+		if gameProcessed then return end
+		self:OnInputBegan(input)
+	end)
+
+	UserInputService.InputEnded:Connect(function(input, gameProcessed)
+		if gameProcessed then return end
+		self:OnInputEnded(input)
+	end)
+
+	print("[InputManager] Initialized successfully!")
+end
+
+function InputManager:SetupCharacter(character)
+	self.Character = character
+	self.Humanoid = character:WaitForChild("Humanoid")
+end
+
+-- Handle input began
+function InputManager:OnInputBegan(input)
+	if not self.InputEnabled then return end
+
+	-- Keyboard shortcuts
+	if input.KeyCode == Enum.KeyCode.E then
+		-- Open pet menu
+		local UIManager = require(script.Parent.UIManager)
+		UIManager:ToggleWindow("PetMenu")
+	elseif input.KeyCode == Enum.KeyCode.Q then
+		-- Open shop
+		local UIManager = require(script.Parent.UIManager)
+		UIManager:ToggleWindow("Shop")
+	elseif input.KeyCode == Enum.KeyCode.T then
+		-- Open trading
+		local UIManager = require(script.Parent.UIManager)
+		UIManager:ToggleWindow("Trading")
+	elseif input.KeyCode == Enum.KeyCode.Escape then
+		-- Open settings
+		local UIManager = require(script.Parent.UIManager)
+		UIManager:ToggleWindow("Settings")
+	end
+end
+
+-- Handle input ended
+function InputManager:OnInputEnded(input)
+	-- Handle any release events
+end
+
+-- Enable/disable input
+function InputManager:SetInputEnabled(enabled)
+	self.InputEnabled = enabled
+end
+
+return InputManager
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBXB648052789B2430CBFDEC0852A0AB34A">
+		<Properties>
+			<string name="Name">UIManager</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	UIManager - Manages all UI elements and windows
+	Handles opening/closing menus, updating displays, and animations
+]]
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local Config = require(ReplicatedStorage.Shared.Config)
+local Utils = require(ReplicatedStorage.Shared.Utils)
+
+local UIManager = {}
+UIManager.OpenWindows = {}
+
+function UIManager:Initialize()
+	print("[UIManager] Initializing...")
+
+	-- Wait for UI to load
+	local mainUI = playerGui:WaitForChild("MainUI", 10)
+	if not mainUI then
+		warn("[UIManager] MainUI not found!")
+		return
+	end
+
+	self.MainUI = mainUI
+	self.HUD = mainUI:WaitForChild("HUD")
+	self.Windows = mainUI:WaitForChild("Windows")
+
+	-- Setup button handlers
+	self:SetupButtons()
+
+	print("[UIManager] Initialized successfully!")
+end
+
+-- Setup all button click handlers
+function UIManager:SetupButtons()
+	-- HUD buttons
+	local hud = self.HUD
+
+	-- Pet menu button
+	local petButton = hud:FindFirstChild("PetButton")
+	if petButton then
+		petButton.MouseButton1Click:Connect(function()
+			self:ToggleWindow("PetMenu")
+		end)
+	end
+
+	-- Shop button
+	local shopButton = hud:FindFirstChild("ShopButton")
+	if shopButton then
+		shopButton.MouseButton1Click:Connect(function()
+			self:ToggleWindow("Shop")
+		end)
+	end
+
+	-- Tycoon button
+	local tycoonButton = hud:FindFirstChild("TycoonButton")
+	if tycoonButton then
+		tycoonButton.MouseButton1Click:Connect(function()
+			self:ToggleWindow("Tycoon")
+		end)
+	end
+
+	-- Tower Defense button
+	local tdButton = hud:FindFirstChild("TowerDefenseButton")
+	if tdButton then
+		tdButton.MouseButton1Click:Connect(function()
+			self:ToggleWindow("TowerDefense")
+		end)
+	end
+
+	-- Trading button
+	local tradeButton = hud:FindFirstChild("TradeButton")
+	if tradeButton then
+		tradeButton.MouseButton1Click:Connect(function()
+			self:ToggleWindow("Trading")
+		end)
+	end
+
+	-- Settings button
+	local settingsButton = hud:FindFirstChild("SettingsButton")
+	if settingsButton then
+		settingsButton.MouseButton1Click:Connect(function()
+			self:ToggleWindow("Settings")
+		end)
+	end
+end
+
+-- Toggle window open/close
+function UIManager:ToggleWindow(windowName)
+	local window = self.Windows:FindFirstChild(windowName)
+	if not window then
+		warn("[UIManager] Window not found:", windowName)
+		return
+	end
+
+	if self.OpenWindows[windowName] then
+		self:CloseWindow(windowName)
+	else
+		self:OpenWindow(windowName)
+	end
+end
+
+-- Open window with animation
+function UIManager:OpenWindow(windowName)
+	local window = self.Windows:FindFirstChild(windowName)
+	if not window then return end
+
+	-- Close other windows (optional - comment out for multiple windows)
+	for name, _ in pairs(self.OpenWindows) do
+		if name ~= windowName then
+			self:CloseWindow(name)
+		end
+	end
+
+	window.Visible = true
+	self.OpenWindows[windowName] = true
+
+	-- Animate in
+	window.Position = UDim2.new(0.5, 0, 1.5, 0)
+	window.AnchorPoint = Vector2.new(0.5, 0.5)
+
+	local tween = TweenService:Create(window, TweenInfo.new(Config.UI_ANIMATION_SPEED, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+		Position = UDim2.new(0.5, 0, 0.5, 0)
+	})
+	tween:Play()
+end
+
+-- Close window with animation
+function UIManager:CloseWindow(windowName)
+	local window = self.Windows:FindFirstChild(windowName)
+	if not window then return end
+
+	self.OpenWindows[windowName] = false
+
+	-- Animate out
+	local tween = TweenService:Create(window, TweenInfo.new(Config.UI_ANIMATION_SPEED, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+		Position = UDim2.new(0.5, 0, 1.5, 0)
+	})
+	tween:Play()
+
+	tween.Completed:Connect(function()
+		window.Visible = false
+	end)
+end
+
+-- Update currency display
+function UIManager:UpdateCurrency(currencyType, amount)
+	local currencyLabel = self.HUD:FindFirstChild(currencyType .. "Label")
+	if currencyLabel then
+		currencyLabel.Text = Utils.FormatNumber(amount)
+	end
+end
+
+-- Show pet hatch animation
+function UIManager:ShowHatchAnimation(petData)
+	local hatchWindow = self.Windows:FindFirstChild("HatchAnimation")
+	if not hatchWindow then return end
+
+	hatchWindow.Visible = true
+
+	local petNameLabel = hatchWindow:FindFirstChild("PetName")
+	local rarityLabel = hatchWindow:FindFirstChild("Rarity")
+
+	if petNameLabel then
+		petNameLabel.Text = petData.Name
+	end
+
+	if rarityLabel then
+		rarityLabel.Text = petData.Rarity
+		rarityLabel.TextColor3 = Utils.GetRarityColor(petData.Rarity)
+	end
+
+	-- Auto close after 3 seconds
+	task.wait(3)
+	hatchWindow.Visible = false
+end
+
+-- Show trade request popup
+function UIManager:ShowTradeRequest(requester, tradeId)
+	local tradeRequestPopup = self.Windows:FindFirstChild("TradeRequest")
+	if not tradeRequestPopup then return end
+
+	tradeRequestPopup.Visible = true
+
+	local messageLabel = tradeRequestPopup:FindFirstChild("Message")
+	if messageLabel then
+		messageLabel.Text = requester.Name .. " wants to trade with you!"
+	end
+
+	-- Accept button
+	local acceptButton = tradeRequestPopup:FindFirstChild("AcceptButton")
+	if acceptButton then
+		acceptButton.MouseButton1Click:Connect(function()
+			ReplicatedStorage.Remotes.AcceptTradeRequest:FireServer(tradeId)
+			tradeRequestPopup.Visible = false
+		end)
+	end
+
+	-- Decline button
+	local declineButton = tradeRequestPopup:FindFirstChild("DeclineButton")
+	if declineButton then
+		declineButton.MouseButton1Click:Connect(function()
+			ReplicatedStorage.Remotes.DeclineTradeRequest:FireServer(tradeId)
+			tradeRequestPopup.Visible = false
+		end)
+	end
+end
+
+-- Open trade window
+function UIManager:OpenTradeWindow(tradeData)
+	self:OpenWindow("Trading")
+	-- Setup trade window with data
+	-- Implementation would populate trade slots, etc.
+end
+
+-- Close trade window
+function UIManager:CloseTradeWindow()
+	self:CloseWindow("Trading")
+end
+
+-- Show event banner
+function UIManager:ShowEventBanner(eventData)
+	local eventBanner = self.HUD:FindFirstChild("EventBanner")
+	if not eventBanner then return end
+
+	eventBanner.Visible = true
+	local eventNameLabel = eventBanner:FindFirstChild("EventName")
+	if eventNameLabel then
+		eventNameLabel.Text = eventData.Name
+	end
+
+	-- Auto hide after 5 seconds
+	task.wait(5)
+	eventBanner.Visible = false
+end
+
+-- Show achievement popup
+function UIManager:ShowAchievementPopup(achievement)
+	local achievementPopup = self.HUD:FindFirstChild("AchievementPopup")
+	if not achievementPopup then return end
+
+	achievementPopup.Visible = true
+
+	local titleLabel = achievementPopup:FindFirstChild("Title")
+	local descLabel = achievementPopup:FindFirstChild("Description")
+
+	if titleLabel then
+		titleLabel.Text = achievement.Name
+	end
+
+	if descLabel then
+		descLabel.Text = achievement.Description
+	end
+
+	-- Auto hide after 4 seconds
+	task.wait(4)
+	achievementPopup.Visible = false
+end
+
+return UIManager
+]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="LocalScript" referent="RBX6634905B36EB4C229C7F9B0ECA72FAB8">
+		<Properties>
+			<string name="Name">MainClient</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	MainClient - Main client-side controller
+	Initializes all client systems and UI managers
+]]
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterGui = game:GetService("StarterGui")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Shared modules
+local Config = require(ReplicatedStorage.Shared.Config)
+local Utils = require(ReplicatedStorage.Shared.Utils)
+local PetData = require(ReplicatedStorage.Shared.PetData)
+
+-- Client modules
+local UIManager = require(script.Parent.Modules.UIManager)
+local InputManager = require(script.Parent.Modules.InputManager)
+local CameraController = require(script.Parent.Modules.CameraController)
+local SoundManager = require(script.Parent.Modules.SoundManager)
+local NotificationManager = require(script.Parent.Modules.NotificationManager)
+
+print("[Client] Pet Kingdom Defenders - Initializing...")
+
+-- Initialize client systems
+local function initializeClient()
+	-- Initialize managers
+	UIManager:Initialize()
+	InputManager:Initialize()
+	CameraController:Initialize()
+	SoundManager:Initialize()
+	NotificationManager:Initialize()
+
+	print("[Client] All systems initialized successfully!")
+
+	-- Show welcome notification
+	NotificationManager:Show("Welcome to Pet Kingdom Defenders!", "success")
+end
+
+-- Setup remote event listeners
+local function setupRemoteListeners()
+	-- Currency updates
+	ReplicatedStorage.Remotes.UpdateCurrency.OnClientEvent:Connect(function(currencyType, newAmount)
+		UIManager:UpdateCurrency(currencyType, newAmount)
+	end)
+
+	-- Level up
+	ReplicatedStorage.Remotes.LevelUp.OnClientEvent:Connect(function(newLevel)
+		NotificationManager:Show("Level Up! Now Level " .. newLevel, "success")
+		SoundManager:PlaySound("LevelUp")
+	end)
+
+	-- Pet hatching
+	ReplicatedStorage.Remotes.HatchResult.OnClientEvent:Connect(function(success, data)
+		if success then
+			UIManager:ShowHatchAnimation(data)
+			NotificationManager:Show("Hatched: " .. data.Name, "success")
+		else
+			NotificationManager:Show(data, "error")
+		end
+	end)
+
+	-- Trading
+	ReplicatedStorage.Remotes.TradeRequest.OnClientEvent:Connect(function(requester, tradeId)
+		UIManager:ShowTradeRequest(requester, tradeId)
+	end)
+
+	ReplicatedStorage.Remotes.TradeAccepted.OnClientEvent:Connect(function(tradeData)
+		UIManager:OpenTradeWindow(tradeData)
+	end)
+
+	ReplicatedStorage.Remotes.TradeCompleted.OnClientEvent:Connect(function()
+		NotificationManager:Show("Trade completed successfully!", "success")
+		UIManager:CloseTradeWindow()
+	end)
+
+	-- Events
+	ReplicatedStorage.Remotes.EventStarted.OnClientEvent:Connect(function(eventData)
+		NotificationManager:Show("Event Started: " .. eventData.Name, "special")
+		UIManager:ShowEventBanner(eventData)
+	end)
+
+	-- Achievements
+	ReplicatedStorage.Remotes.AchievementUnlocked.OnClientEvent:Connect(function(achievement)
+		UIManager:ShowAchievementPopup(achievement)
+		SoundManager:PlaySound("Achievement")
+	end)
+end
+
+-- Character added handler
+local function onCharacterAdded(character)
+	local humanoid = character:WaitForChild("Humanoid")
+
+	-- Setup character-specific systems
+	CameraController:SetupCharacter(character)
+	InputManager:SetupCharacter(character)
+end
+
+-- Initialize
+initializeClient()
+setupRemoteListeners()
+
+-- Handle character
+if player.Character then
+	onCharacterAdded(player.Character)
+end
+player.CharacterAdded:Connect(onCharacterAdded)
+
+print("[Client] Pet Kingdom Defenders is running!")
+]]></ProtectedString>
+		</Properties>
+	</Item>
+				<Properties>
+					<string name="Name">Modules</string>
+				</Properties>
+				<!-- Add LocalScripts:
+					- UIManager.lua
+					- InputManager.lua
+					- CameraController.lua
+					- SoundManager.lua
+					- NotificationManager.lua
+				-->
+			</Item>
+
+			<!-- MainClient.lua (add manually) -->
+		</Item>
+	</Item>
+
+	<!-- STARTER GUI -->
+	<Item class="StarterGui" referent="RBXSTARTERGUI">
+	<Item class="LocalScript" referent="RBXD677176FDD7E45A29912D5DAF8222789">
+		<Properties>
+			<string name="Name">MainUI</string>
+			<ProtectedString name="Source"><![CDATA[--[[
+	MainUI - Main UI structure setup script
+	Creates all UI elements programmatically for the game
+]]
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Create main ScreenGui
+local mainUI = Instance.new("ScreenGui")
+mainUI.Name = "MainUI"
+mainUI.ResetOnSpawn = false
+mainUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Create HUD frame
+local hud = Instance.new("Frame")
+hud.Name = "HUD"
+hud.Size = UDim2.new(1, 0, 1, 0)
+hud.BackgroundTransparency = 1
+hud.Parent = mainUI
+
+-- Currency display
+local function createCurrencyDisplay(name, position, icon)
+	local frame = Instance.new("Frame")
+	frame.Name = name .. "Display"
+	frame.Size = UDim2.new(0, 150, 0, 40)
+	frame.Position = position
+	frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+	frame.BorderSizePixel = 0
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 8)
+	corner.Parent = frame
+
+	local iconLabel = Instance.new("TextLabel")
+	iconLabel.Size = UDim2.new(0, 30, 0, 30)
+	iconLabel.Position = UDim2.new(0, 5, 0, 5)
+	iconLabel.BackgroundTransparency = 1
+	iconLabel.Text = icon
+	iconLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	iconLabel.Font = Enum.Font.GothamBold
+	iconLabel.TextScaled = true
+	iconLabel.Parent = frame
+
+	local valueLabel = Instance.new("TextLabel")
+	valueLabel.Name = name .. "Label"
+	valueLabel.Size = UDim2.new(1, -40, 1, 0)
+	valueLabel.Position = UDim2.new(0, 40, 0, 0)
+	valueLabel.BackgroundTransparency = 1
+	valueLabel.Text = "0"
+	valueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	valueLabel.Font = Enum.Font.GothamBold
+	valueLabel.TextScaled = true
+	valueLabel.TextXAlignment = Enum.TextXAlignment.Left
+	valueLabel.Parent = frame
+
+	frame.Parent = hud
+	return frame
+end
+
+createCurrencyDisplay("Coins", UDim2.new(0, 10, 0, 10), "💰")
+createCurrencyDisplay("Gems", UDim2.new(0, 170, 0, 10), "💎")
+
+-- Bottom menu buttons
+local function createMenuButton(name, position, text)
+	local button = Instance.new("TextButton")
+	button.Name = name .. "Button"
+	button.Size = UDim2.new(0, 100, 0, 50)
+	button.Position = position
+	button.AnchorPoint = Vector2.new(0.5, 1)
+	button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+	button.BorderSizePixel = 0
+	button.Text = text
+	button.TextColor3 = Color3.fromRGB(255, 255, 255)
+	button.Font = Enum.Font.GothamBold
+	button.TextScaled = true
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 8)
+	corner.Parent = button
+
+	button.Parent = hud
+	return button
+end
+
+createMenuButton("Pet", UDim2.new(0.2, 0, 1, -10), "Pets")
+createMenuButton("Shop", UDim2.new(0.35, 0, 1, -10), "Shop")
+createMenuButton("Tycoon", UDim2.new(0.5, 0, 1, -10), "Tycoon")
+createMenuButton("TowerDefense", UDim2.new(0.65, 0, 1, -10), "Tower Defense")
+createMenuButton("Trade", UDim2.new(0.8, 0, 1, -10), "Trade")
+
+-- Settings button (top right)
+createMenuButton("Settings", UDim2.new(1, -60, 0, 60), "⚙️")
+
+-- Create Windows container
+local windows = Instance.new("Frame")
+windows.Name = "Windows"
+windows.Size = UDim2.new(1, 0, 1, 0)
+windows.BackgroundTransparency = 1
+windows.Parent = mainUI
+
+-- Create window templates
+local function createWindow(name, title)
+	local window = Instance.new("Frame")
+	window.Name = name
+	window.Size = UDim2.new(0, 600, 0, 400)
+	window.Position = UDim2.new(0.5, 0, 0.5, 0)
+	window.AnchorPoint = Vector2.new(0.5, 0.5)
+	window.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+	window.BorderSizePixel = 0
+	window.Visible = false
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 12)
+	corner.Parent = window
+
+	-- Title bar
+	local titleBar = Instance.new("Frame")
+	titleBar.Name = "TitleBar"
+	titleBar.Size = UDim2.new(1, 0, 0, 40)
+	titleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+	titleBar.BorderSizePixel = 0
+
+	local titleCorner = Instance.new("UICorner")
+	titleCorner.CornerRadius = UDim.new(0, 12)
+	titleCorner.Parent = titleBar
+
+	local titleLabel = Instance.new("TextLabel")
+	titleLabel.Size = UDim2.new(1, -40, 1, 0)
+	titleLabel.Position = UDim2.new(0, 10, 0, 0)
+	titleLabel.BackgroundTransparency = 1
+	titleLabel.Text = title
+	titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	titleLabel.Font = Enum.Font.GothamBold
+	titleLabel.TextScaled = true
+	titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+	titleLabel.Parent = titleBar
+
+	titleBar.Parent = window
+
+	-- Close button
+	local closeButton = Instance.new("TextButton")
+	closeButton.Name = "CloseButton"
+	closeButton.Size = UDim2.new(0, 30, 0, 30)
+	closeButton.Position = UDim2.new(1, -35, 0, 5)
+	closeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+	closeButton.BorderSizePixel = 0
+	closeButton.Text = "X"
+	closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+	closeButton.Font = Enum.Font.GothamBold
+	closeButton.TextScaled = true
+	closeButton.Parent = titleBar
+
+	local closeCorner = Instance.new("UICorner")
+	closeCorner.CornerRadius = UDim.new(0, 8)
+	closeCorner.Parent = closeButton
+
+	-- Content frame
+	local content = Instance.new("ScrollingFrame")
+	content.Name = "Content"
+	content.Size = UDim2.new(1, -20, 1, -60)
+	content.Position = UDim2.new(0, 10, 0, 50)
+	content.BackgroundTransparency = 1
+	content.ScrollBarThickness = 6
+	content.Parent = window
+
+	window.Parent = windows
+	return window
+end
+
+-- Create all windows
+createWindow("PetMenu", "My Pets")
+createWindow("Shop", "Shop")
+createWindow("Tycoon", "My Tycoon")
+createWindow("TowerDefense", "Tower Defense")
+createWindow("Trading", "Trading")
+createWindow("Settings", "Settings")
+
+-- Notification container
+local notificationContainer = Instance.new("Frame")
+notificationContainer.Name = "NotificationContainer"
+notificationContainer.Size = UDim2.new(1, 0, 1, 0)
+notificationContainer.BackgroundTransparency = 1
+notificationContainer.Parent = mainUI
+
+-- Event banner
+local eventBanner = Instance.new("Frame")
+eventBanner.Name = "EventBanner"
+eventBanner.Size = UDim2.new(0, 400, 0, 60)
+eventBanner.Position = UDim2.new(0.5, 0, 0, 70)
+eventBanner.AnchorPoint = Vector2.new(0.5, 0)
+eventBanner.BackgroundColor3 = Color3.fromRGB(255, 200, 50)
+eventBanner.BorderSizePixel = 0
+eventBanner.Visible = false
+
+local bannerCorner = Instance.new("UICorner")
+bannerCorner.CornerRadius = UDim.new(0, 8)
+bannerCorner.Parent = eventBanner
+
+local eventNameLabel = Instance.new("TextLabel")
+eventNameLabel.Name = "EventName"
+eventNameLabel.Size = UDim2.new(1, -20, 1, -20)
+eventNameLabel.Position = UDim2.new(0, 10, 0, 10)
+eventNameLabel.BackgroundTransparency = 1
+eventNameLabel.Text = "Event Active!"
+eventNameLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+eventNameLabel.Font = Enum.Font.GothamBold
+eventNameLabel.TextScaled = true
+eventNameLabel.Parent = eventBanner
+
+eventBanner.Parent = hud
+
+-- Achievement popup
+local achievementPopup = Instance.new("Frame")
+achievementPopup.Name = "AchievementPopup"
+achievementPopup.Size = UDim2.new(0, 350, 0, 100)
+achievementPopup.Position = UDim2.new(0.5, 0, 0, 150)
+achievementPopup.AnchorPoint = Vector2.new(0.5, 0)
+achievementPopup.BackgroundColor3 = Color3.fromRGB(100, 200, 100)
+achievementPopup.BorderSizePixel = 0
+achievementPopup.Visible = false
+
+local achievementCorner = Instance.new("UICorner")
+achievementCorner.CornerRadius = UDim.new(0, 8)
+achievementCorner.Parent = achievementPopup
+
+local achievementTitle = Instance.new("TextLabel")
+achievementTitle.Name = "Title"
+achievementTitle.Size = UDim2.new(1, -20, 0, 40)
+achievementTitle.Position = UDim2.new(0, 10, 0, 5)
+achievementTitle.BackgroundTransparency = 1
+achievementTitle.Text = "Achievement Unlocked!"
+achievementTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+achievementTitle.Font = Enum.Font.GothamBold
+achievementTitle.TextScaled = true
+achievementTitle.Parent = achievementPopup
+
+local achievementDesc = Instance.new("TextLabel")
+achievementDesc.Name = "Description"
+achievementDesc.Size = UDim2.new(1, -20, 0, 40)
+achievementDesc.Position = UDim2.new(0, 10, 0, 50)
+achievementDesc.BackgroundTransparency = 1
+achievementDesc.Text = "Description here"
+achievementDesc.TextColor3 = Color3.fromRGB(255, 255, 255)
+achievementDesc.Font = Enum.Font.Gotham
+achievementDesc.TextScaled = true
+achievementDesc.Parent = achievementPopup
+
+achievementPopup.Parent = hud
+
+-- Parent to PlayerGui
+mainUI.Parent = playerGui
+
+print("[MainUI] UI structure created successfully!")
+]]></ProtectedString>
+		</Properties>
+	</Item>
+		<Properties>
+			<string name="Name">StarterGui</string>
+		</Properties>
+		<!-- MainUI.lua creates all UI programmatically -->
+	</Item>
+
+	<!-- SOUND SERVICE -->
+	<Item class="SoundService" referent="RBXSOUNDSERVICE">
+		<Properties>
+			<string name="Name">SoundService</string>
+		</Properties>
+		<!-- SoundManager.lua creates sounds here -->
+	</Item>
+
+	<!-- PLAYERS -->
+	<Item class="Players" referent="RBXPLAYERS">
+		<Properties>
+			<string name="Name">Players</string>
+		</Properties>
+	</Item>
+
+	<!-- TEAMS (Optional) -->
+	<Item class="Teams" referent="RBXTEAMS">
+		<Properties>
+			<string name="Name">Teams</string>
+		</Properties>
+	</Item>
+
+</roblox>
