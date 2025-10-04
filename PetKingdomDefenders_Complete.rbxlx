@@ -126,7 +126,7 @@
 
 		<!-- Remotes Folder -->
 		<Item class="Folder" referent="RBX10">
-	<Item class="ModuleScript" referent="RBXCD0341DAF2BC40AE8A2A88C126621C9D">
+	<Item class="ModuleScript" referent="RBX105FAD47CE9C4AD0A6A4D80F2011A90B">
 		<Properties>
 			<string name="Name">RemotesSetup</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -242,7 +242,7 @@ return remotesFolder
 
 		<!-- Shared Folder -->
 		<Item class="Folder" referent="RBX11">
-	<Item class="ModuleScript" referent="RBX3AD9549061B349DE99D4433B5BE20603">
+	<Item class="ModuleScript" referent="RBX93A06BDD15514FFA802FEA05F7624332">
 		<Properties>
 			<string name="Name">Utils</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -448,7 +448,7 @@ return Utils
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBXD565C58DB0B44A59890D64A94F616792">
+	<Item class="ModuleScript" referent="RBX885EB8F232C74A8AAA9D47BCA231DB49">
 		<Properties>
 			<string name="Name">PetData</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -714,7 +714,7 @@ return PetData
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX400CBF6599464CF7A7DB64DD0A10C7C6">
+	<Item class="ModuleScript" referent="RBX024B32ADD01047BDA6A7A1109EFD0891">
 		<Properties>
 			<string name="Name">Config</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -915,479 +915,7 @@ Config.SHOP_PRODUCTS = {
 		Name = "100 Gems",
 		Type = "Gems",
 		Amount = 100,
-		Price = 100 -- Robux (approx <Item class="Folder" referent="RBX11">
-	<Item class="ModuleScript" referent="RBX3AD9549061B349DE99D4433B5BE20603">
-		<Properties>
-			<string name="Name">Utils</string>
-			<ProtectedString name="Source"><![CDATA[--[[
-	Utils - Utility functions used across client and server
-	Common helper functions for formatting, calculations, and more
-]]
-
-local Utils = {}
-
--- Format large numbers with abbreviations (1000 -> 1K, 1000000 -> 1M)
-function Utils.FormatNumber(num)
-	if num < 1000 then
-		return tostring(math.floor(num))
-	elseif num < 1000000 then
-		return string.format("%.1fK", num / 1000)
-	elseif num < 1000000000 then
-		return string.format("%.1fM", num / 1000000)
-	else
-		return string.format("%.1fB", num / 1000000000)
-	end
-end
-
--- Format time in seconds to MM:SS
-function Utils.FormatTime(seconds)
-	local mins = math.floor(seconds / 60)
-	local secs = math.floor(seconds % 60)
-	return string.format("%02d:%02d", mins, secs)
-end
-
--- Format time with hours HH:MM:SS
-function Utils.FormatTimeHours(seconds)
-	local hours = math.floor(seconds / 3600)
-	local mins = math.floor((seconds % 3600) / 60)
-	local secs = math.floor(seconds % 60)
-	return string.format("%02d:%02d:%02d", hours, mins, secs)
-end
-
--- Lerp between two numbers
-function Utils.Lerp(a, b, t)
-	return a + (b - a) * t
-end
-
--- Clamp value between min and max
-function Utils.Clamp(value, min, max)
-	return math.max(min, math.min(max, value))
-end
-
--- Get rarity color
-function Utils.GetRarityColor(rarity)
-	local colors = {
-		Common = Color3.fromRGB(155, 155, 155),
-		Uncommon = Color3.fromRGB(100, 255, 100),
-		Rare = Color3.fromRGB(100, 150, 255),
-		Epic = Color3.fromRGB(200, 100, 255),
-		Legendary = Color3.fromRGB(255, 200, 50)
-	}
-
-	return colors[rarity] or Color3.fromRGB(255, 255, 255)
-end
-
--- Deep copy table
-function Utils.DeepCopy(original)
-	local copy = {}
-	for key, value in pairs(original) do
-		if type(value) == "table" then
-			copy[key] = Utils.DeepCopy(value)
-		else
-			copy[key] = value
-		end
-	end
-	return copy
-end
-
--- Shuffle array
-function Utils.Shuffle(array)
-	local shuffled = Utils.DeepCopy(array)
-	for i = #shuffled, 2, -1 do
-		local j = math.random(i)
-		shuffled[i], shuffled[j] = shuffled[j], shuffled[i]
-	end
-	return shuffled
-end
-
--- Round to decimal places
-function Utils.Round(num, decimalPlaces)
-	local mult = 10 ^ (decimalPlaces or 0)
-	return math.floor(num * mult + 0.5) / mult
-end
-
--- Calculate distance between two Vector3 positions
-function Utils.Distance(pos1, pos2)
-	return (pos1 - pos2).Magnitude
-end
-
--- Check if point is within radius of center
-function Utils.IsInRadius(point, center, radius)
-	return Utils.Distance(point, center) <= radius
-end
-
--- Generate random position within bounds
-function Utils.RandomPositionInBox(min, max)
-	return Vector3.new(
-		math.random(min.X, max.X),
-		math.random(min.Y, max.Y),
-		math.random(min.Z, max.Z)
-	)
-end
-
--- Weighted random selection
-function Utils.WeightedRandom(weights)
-	local totalWeight = 0
-	for _, weight in pairs(weights) do
-		totalWeight += weight
-	end
-
-	local random = math.random() * totalWeight
-	local currentWeight = 0
-
-	for item, weight in pairs(weights) do
-		currentWeight += weight
-		if random <= currentWeight then
-			return item
-		end
-	end
-
-	-- Fallback
-	for item, _ in pairs(weights) do
-		return item
-	end
-end
-
--- Tween number with easing
-function Utils.EaseInOut(t)
-	return t < 0.5 and 2 * t * t or -1 + (4 - 2 * t) * t
-end
-
--- Create billboard GUI for floating text
-function Utils.CreateFloatingText(text, position, duration, color)
-	local billboardGui = Instance.new("BillboardGui")
-	billboardGui.Size = UDim2.new(4, 0, 1, 0)
-	billboardGui.StudsOffset = Vector3.new(0, 2, 0)
-	billboardGui.AlwaysOnTop = true
-	billboardGui.Adornee = nil
-
-	local textLabel = Instance.new("TextLabel")
-	textLabel.Size = UDim2.new(1, 0, 1, 0)
-	textLabel.BackgroundTransparency = 1
-	textLabel.Text = text
-	textLabel.TextColor3 = color or Color3.fromRGB(255, 255, 255)
-	textLabel.TextScaled = true
-	textLabel.Font = Enum.Font.GothamBold
-	textLabel.Parent = billboardGui
-
-	billboardGui.Parent = workspace
-
-	-- Animate up and fade
-	local start = tick()
-	game:GetService("RunService").Heartbeat:Connect(function()
-		local elapsed = tick() - start
-		if elapsed >= duration then
-			billboardGui:Destroy()
-		else
-			local alpha = 1 - (elapsed / duration)
-			textLabel.TextTransparency = 1 - alpha
-			billboardGui.StudsOffset = Vector3.new(0, 2 + elapsed * 2, 0)
-		end
-	end)
-
-	return billboardGui
-end
-
--- Play sound effect
-function Utils.PlaySound(soundId, volume, parent)
-	local sound = Instance.new("Sound")
-	sound.SoundId = soundId
-	sound.Volume = volume or 0.5
-	sound.Parent = parent or game.Workspace
-
-	sound:Play()
-
-	sound.Ended:Connect(function()
-		sound:Destroy()
-	end)
-
-	return sound
-end
-
--- Vibrate mobile device (if on mobile)
-function Utils.VibrateDevice()
-	local UserInputService = game:GetService("UserInputService")
-	local HapticService = game:GetService("HapticService")
-
-	if UserInputService.TouchEnabled then
-		pcall(function()
-			HapticService:SetMotor(Enum.UserInputType.Gamepad1, Enum.VibrationMotor.Small, 0.5)
-			task.wait(0.1)
-			HapticService:SetMotor(Enum.UserInputType.Gamepad1, Enum.VibrationMotor.Small, 0)
-		end)
-	end
-end
-
-return Utils
-]]></ProtectedString>
-		</Properties>
-	</Item>
-	<Item class="ModuleScript" referent="RBXD565C58DB0B44A59890D64A94F616792">
-		<Properties>
-			<string name="Name">PetData</string>
-			<ProtectedString name="Source"><![CDATA[--[[
-	PetData - Contains all pet definitions, stats, and abilities
-	Reference for all available pets in the game
-
-	FREE PET MODELS - How to Get Them:
-
-	Option 1: FREE Pet Packs from Roblox DevForum
-	- 300+ Free Simulator Pets: devforum.roblox.com/t/300-free-simulator-pets/692024
-	- 100+ Quality Pets: devforum.roblox.com/t/100-good-quality-simulator-pets/426398
-	- 28 Pet Pack: devforum.roblox.com/t/free-pet-pack-28-pets/958670
-
-	Option 2: Roblox Toolbox (in Studio)
-	- Open Toolbox → Models → Search "pet simulator"
-	- Filter by: Free models
-	- Insert model → Get MeshId from properties
-
-	Option 3: Use Simple Parts (Current Implementation)
-	- PetSystem.lua already creates Part-based pets
-	- Works without mesh IDs
-	- Just colored spheres/balls
-
-	To Add Mesh Models:
-	1. Get model from DevForum or Toolbox
-	2. Insert into workspace
-	3. Check MeshPart → Properties → MeshId
-	4. Copy the asset ID number
-	5. Update Model fields below: "rbxassetid://YOUR_ID"
-	6. For icons: Use Roblox image editor or keep at 0
-
-	NOTE: Current game works with Part-based pets (balls)
-	Mesh IDs are OPTIONAL for enhanced visuals
-]]
-
-local PetData = {
-	-- BASIC PETS (Common/Uncommon)
-	Dog = {
-		Name = "Loyal Dog",
-		Rarity = "Common",
-		BasePower = 10,
-		BaseSpeed = 15,
-		Ability = "Fetch",
-		AbilityDescription = "Automatically collects nearby coins",
-		Model = "rbxassetid://0", -- Replace with actual model ID
-		Icon = "rbxassetid://0"
-	},
-
-	Cat = {
-		Name = "Nimble Cat",
-		Rarity = "Common",
-		BasePower = 8,
-		BaseSpeed = 20,
-		Ability = "Nine Lives",
-		AbilityDescription = "Small chance to dodge enemy attacks",
-		Model = "rbxassetid://0",
-		Icon = "rbxassetid://0"
-	},
-
-	Bunny = {
-		Name = "Hopping Bunny",
-		Rarity = "Common",
-		BasePower = 6,
-		BaseSpeed = 25,
-		Ability = "Lucky Hop",
-		AbilityDescription = "Increased coin drops",
-		Model = "rbxassetid://0",
-		Icon = "rbxassetid://0"
-	},
-
-	Hamster = {
-		Name = "Tiny Hamster",
-		Rarity = "Uncommon",
-		BasePower = 12,
-		BaseSpeed = 18,
-		Ability = "Hoard",
-		AbilityDescription = "Bonus passive income",
-		Model = "rbxassetid://0",
-		Icon = "rbxassetid://0"
-	},
-
-	Bird = {
-		Name = "Flying Bird",
-		Rarity = "Uncommon",
-		BasePower = 14,
-		BaseSpeed = 30,
-		Ability = "Air Strike",
-		AbilityDescription = "Deal damage from above",
-		Model = "rbxassetid://0",
-		Icon = "rbxassetid://0"
-	},
-
-	-- GOLDEN PETS (Rare/Epic)
-	Lion = {
-		Name = "Mighty Lion",
-		Rarity = "Rare",
-		BasePower = 35,
-		BaseSpeed = 20,
-		Ability = "Roar",
-		AbilityDescription = "Stuns nearby enemies",
-		Model = "rbxassetid://0",
-		Icon = "rbxassetid://0"
-	},
-
-	Eagle = {
-		Name = "Soaring Eagle",
-		Rarity = "Rare",
-		BasePower = 30,
-		BaseSpeed = 40,
-		Ability = "Dive Bomb",
-		AbilityDescription = "Powerful targeted attack",
-		Model = "rbxassetid://0",
-		Icon = "rbxassetid://0"
-	},
-
-	Wolf = {
-		Name = "Pack Wolf",
-		Rarity = "Rare",
-		BasePower = 32,
-		BaseSpeed = 35,
-		Ability = "Pack Hunter",
-		AbilityDescription = "Stronger with other pets",
-		Model = "rbxassetid://0",
-		Icon = "rbxassetid://0"
-	},
-
-	Fox = {
-		Name = "Clever Fox",
-		Rarity = "Epic",
-		BasePower = 45,
-		BaseSpeed = 38,
-		Ability = "Cunning",
-		AbilityDescription = "Double coin chance",
-		Model = "rbxassetid://0",
-		Icon = "rbxassetid://0"
-	},
-
-	Bear = {
-		Name = "Grizzly Bear",
-		Rarity = "Epic",
-		BasePower = 55,
-		BaseSpeed = 25,
-		Ability = "Maul",
-		AbilityDescription = "Massive damage to single target",
-		Model = "rbxassetid://0",
-		Icon = "rbxassetid://0"
-	},
-
-	-- MYSTIC PETS (Epic/Legendary)
-	Dragon = {
-		Name = "Fire Dragon",
-		Rarity = "Epic",
-		BasePower = 70,
-		BaseSpeed = 45,
-		Ability = "Flame Breath",
-		AbilityDescription = "Area damage over time",
-		Model = "rbxassetid://0",
-		Icon = "rbxassetid://0"
-	},
-
-	Phoenix = {
-		Name = "Eternal Phoenix",
-		Rarity = "Epic",
-		BasePower = 65,
-		BaseSpeed = 50,
-		Ability = "Rebirth",
-		AbilityDescription = "Revives once per wave",
-		Model = "rbxassetid://0",
-		Icon = "rbxassetid://0"
-	},
-
-	Unicorn = {
-		Name = "Magical Unicorn",
-		Rarity = "Legendary",
-		BasePower = 80,
-		BaseSpeed = 55,
-		Ability = "Healing Light",
-		AbilityDescription = "Heals base over time",
-		Model = "rbxassetid://0",
-		Icon = "rbxassetid://0"
-	},
-
-	Griffin = {
-		Name = "Royal Griffin",
-		Rarity = "Legendary",
-		BasePower = 85,
-		BaseSpeed = 60,
-		Ability = "Divine Shield",
-		AbilityDescription = "Protects base from damage",
-		Model = "rbxassetid://0",
-		Icon = "rbxassetid://0"
-	},
-
-	Pegasus = {
-		Name = "Sky Pegasus",
-		Rarity = "Legendary",
-		BasePower = 75,
-		BaseSpeed = 70,
-		Ability = "Cloud Walk",
-		AbilityDescription = "Increases all pet speed",
-		Model = "rbxassetid://0",
-		Icon = "rbxassetid://0"
-	},
-
-	-- ULTIMATE PETS (Legendary)
-	["Celestial Dragon"] = {
-		Name = "Celestial Dragon",
-		Rarity = "Legendary",
-		BasePower = 150,
-		BaseSpeed = 80,
-		Ability = "Cosmic Fire",
-		AbilityDescription = "Massive area damage",
-		Model = "rbxassetid://0",
-		Icon = "rbxassetid://0"
-	},
-
-	["Divine Phoenix"] = {
-		Name = "Divine Phoenix",
-		Rarity = "Legendary",
-		BasePower = 140,
-		BaseSpeed = 90,
-		Ability = "Infinite Rebirth",
-		AbilityDescription = "Multiple revivals per wave",
-		Model = "rbxassetid://0",
-		Icon = "rbxassetid://0"
-	},
-
-	["Rainbow Unicorn"] = {
-		Name = "Rainbow Unicorn",
-		Rarity = "Legendary",
-		BasePower = 160,
-		BaseSpeed = 85,
-		Ability = "Rainbow Blessing",
-		AbilityDescription = "All rewards multiplied",
-		Model = "rbxassetid://0",
-		Icon = "rbxassetid://0"
-	},
-
-	["Golden Griffin"] = {
-		Name = "Golden Griffin",
-		Rarity = "Legendary",
-		BasePower = 170,
-		BaseSpeed = 95,
-		Ability = "Golden Aura",
-		AbilityDescription = "Massive coin generation",
-		Model = "rbxassetid://0",
-		Icon = "rbxassetid://0"
-	},
-
-	["Crystal Pegasus"] = {
-		Name = "Crystal Pegasus",
-		Rarity = "Legendary",
-		BasePower = 155,
-		BaseSpeed = 100,
-		Ability = "Crystal Storm",
-		AbilityDescription = "Freezes and damages all enemies",
-		Model = "rbxassetid://0",
-		Icon = "rbxassetid://0"
-	}
-}
-
-return PetData
-]]></ProtectedString>
-		</Properties>
-	</Item> USD)
+		Price = 100 -- Robux (approx $1 USD)
 	},
 	[0000000002] = { -- REPLACE with real Product ID
 		Name = "500 Gems",
@@ -1535,7 +1063,7 @@ return Config
 
 		<!-- Modules Folder -->
 		<Item class="Folder" referent="RBX20">
-	<Item class="ModuleScript" referent="RBX28D67CDBF03B499FA9FE34D9F56BE8F4">
+	<Item class="ModuleScript" referent="RBX2A2FA473E6AA4B02B86631C4E7CF94BC">
 		<Properties>
 			<string name="Name">ProceduralItemGenerator</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -1833,7 +1361,7 @@ return ProceduralItemGenerator
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX0C3C2947FEFF433B8D0B6EAB98FBB8F2">
+	<Item class="ModuleScript" referent="RBX7E4763CDF147431BAE57C1322F2CDA31">
 		<Properties>
 			<string name="Name">ProceduralUIGenerator</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -2157,7 +1685,7 @@ return ProceduralUIGenerator
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX4D9DCF98FD944B34915670B673C89937">
+	<Item class="ModuleScript" referent="RBXAAF7ACD18DAE48999153AD0420DFCC41">
 		<Properties>
 			<string name="Name">ProceduralTerrainGenerator</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -2377,7 +1905,7 @@ return ProceduralTerrainGenerator
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBXD82C18D8620746138BABB4B90418002B">
+	<Item class="ModuleScript" referent="RBX85CC3460FA8548E98C649AB67537F585">
 		<Properties>
 			<string name="Name">ProceduralEnemyGenerator</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -2698,7 +2226,7 @@ return ProceduralEnemyGenerator
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX1EBFE3C3A67C46659957C831968EA12A">
+	<Item class="ModuleScript" referent="RBX24F0BBF3D2E048678F9F86946749DEBA">
 		<Properties>
 			<string name="Name">ProceduralBuildingGenerator</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -3030,7 +2558,7 @@ return ProceduralBuildingGenerator
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX6F48F8B7BB1D4136974F3948C11B808B">
+	<Item class="ModuleScript" referent="RBXC75DBBEC941C44949CF263D5473C1EFE">
 		<Properties>
 			<string name="Name">ProceduralPetGenerator</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -3350,7 +2878,7 @@ return ProceduralPetGenerator
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBXD20E9DB7A9004D90B90C5CC204F43E35">
+	<Item class="ModuleScript" referent="RBX8384F8E0606F43E8B04DDB76B14DABF3">
 		<Properties>
 			<string name="Name">EventManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -3600,7 +3128,7 @@ return EventManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX11BFF5A2DAF046C0A02B0CCD4F20F5B8">
+	<Item class="ModuleScript" referent="RBX8DE90FBC5DC54D9A9E43FBE27AE4FACE">
 		<Properties>
 			<string name="Name">ObbyManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -3765,7 +3293,7 @@ return ObbyManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX3AF70B14E0DF4BF0B531367713F600A1">
+	<Item class="ModuleScript" referent="RBXABB7C03989EF4952BE4E86489462F87E">
 		<Properties>
 			<string name="Name">TradingSystem</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -4075,7 +3603,7 @@ return TradingSystem
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX2B3B8FE8367F41E0931173BE23CC3CE9">
+	<Item class="ModuleScript" referent="RBX3F0C4D100FAB44DB99F0B77952AA1B86">
 		<Properties>
 			<string name="Name">EconomyManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -4236,7 +3764,7 @@ return EconomyManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBXCC96F53DF1DC4ED98F57CBC9B8EB9542">
+	<Item class="ModuleScript" referent="RBXE0BC9871916B47688F8E63ECBA3C4AEB">
 		<Properties>
 			<string name="Name">TycoonManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -4458,7 +3986,7 @@ return TycoonManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX08C265F5EC5B4DAEAE71FE1018CC0DCE">
+	<Item class="ModuleScript" referent="RBX4CD78DF5BDD84233B71A567F2D0CF696">
 		<Properties>
 			<string name="Name">TowerDefenseManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -4739,7 +4267,7 @@ return TowerDefenseManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX095634F44AF04619BDBD1FD48A3F9A2F">
+	<Item class="ModuleScript" referent="RBX6E559DB6264B4010BEFCA42D18C31336">
 		<Properties>
 			<string name="Name">PetSystem</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -5139,7 +4667,7 @@ return PetSystem
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX29835F30E23C4CF8B07801488D22CAB1">
+	<Item class="ModuleScript" referent="RBX9688B78AADE04C788AA49BCEC3F6696F">
 		<Properties>
 			<string name="Name">DataManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -5423,7 +4951,7 @@ return DataManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX70DB8AE892874F4FA9B9585D667CBA81">
+	<Item class="ModuleScript" referent="RBX4DAF685BB9D2429F8EC15A998E11F3C7">
 		<Properties>
 			<string name="Name">SecurityManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -5688,7 +5216,7 @@ return SecurityManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="Script" referent="RBXD1A0191A9836483E8A799B7D20DD9A89">
+	<Item class="Script" referent="RBXF053F917417748CDB8A6B93B453851D9">
 		<Properties>
 			<string name="Name">MainServer</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -5801,7 +5329,7 @@ print("[Server] Pet Kingdom Defenders is running!")
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="Script" referent="RBX3607231793C74496AD45E569CF415097">
+	<Item class="Script" referent="RBXEA6F5AB0A43A4D848A31866E667178B7">
 		<Properties>
 			<string name="Name">InitializeRemotes</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -5852,7 +5380,7 @@ print("[InitializeRemotes] All remotes initialized!")
 
 			<!-- Modules Folder -->
 			<Item class="Folder" referent="RBX31">
-	<Item class="ModuleScript" referent="RBXACDA719DC52A456EA447400AA1676C28">
+	<Item class="ModuleScript" referent="RBX0F973BD31A7F4B8F837CDAF948645EC6">
 		<Properties>
 			<string name="Name">NotificationManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -6000,7 +5528,7 @@ return NotificationManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX260E1937270047929A72AE7CD9D4B9FA">
+	<Item class="ModuleScript" referent="RBXB1B0BFACB5544F81A600225202F4B9E7">
 		<Properties>
 			<string name="Name">SoundManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -6129,7 +5657,7 @@ return SoundManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBX1C9E2278D5B14878AB817A0DD1BB0BD2">
+	<Item class="ModuleScript" referent="RBX9C2D80C196F34B34BFFAD089F784300A">
 		<Properties>
 			<string name="Name">CameraController</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -6214,7 +5742,7 @@ return CameraController
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBXAFFE6471EAAA4BDC87E576B0D86E4C5C">
+	<Item class="ModuleScript" referent="RBX1FB0EDEE75414BC4BA2ECA3674808697">
 		<Properties>
 			<string name="Name">InputManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -6299,7 +5827,7 @@ return InputManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="ModuleScript" referent="RBXB648052789B2430CBFDEC0852A0AB34A">
+	<Item class="ModuleScript" referent="RBXDB3A1D51A7D24D8DA847A120A0D890BB">
 		<Properties>
 			<string name="Name">UIManager</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -6570,7 +6098,7 @@ return UIManager
 ]]></ProtectedString>
 		</Properties>
 	</Item>
-	<Item class="LocalScript" referent="RBX6634905B36EB4C229C7F9B0ECA72FAB8">
+	<Item class="LocalScript" referent="RBXEB71CEFDB56C4B2E91C5A64FDC078A6B">
 		<Properties>
 			<string name="Name">MainClient</string>
 			<ProtectedString name="Source"><![CDATA[--[[
@@ -6705,7 +6233,7 @@ print("[Client] Pet Kingdom Defenders is running!")
 
 	<!-- STARTER GUI -->
 	<Item class="StarterGui" referent="RBXSTARTERGUI">
-	<Item class="LocalScript" referent="RBXD677176FDD7E45A29912D5DAF8222789">
+	<Item class="LocalScript" referent="RBX0A4FB586189B4C2C95E6E23277826840">
 		<Properties>
 			<string name="Name">MainUI</string>
 			<ProtectedString name="Source"><![CDATA[--[[

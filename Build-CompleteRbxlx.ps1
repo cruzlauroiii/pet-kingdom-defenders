@@ -109,35 +109,56 @@ foreach ($script in $loadedScripts) {
 	</Item>
 "@
 
-    # Insert based on parent
+    # Insert based on parent using IndexOf to only replace first occurrence
     switch ($script.Parent) {
         "ServerScriptService" {
             $marker = '<Item class="Folder" referent="RBX20">'
-            $xmlContent = $xmlContent -replace "($([regex]::Escape($marker)))", "`$1$scriptXml"
+            $index = $xmlContent.IndexOf($marker)
+            if ($index -ge 0) {
+                $xmlContent = $xmlContent.Substring(0, $index + $marker.Length) + $scriptXml + $xmlContent.Substring($index + $marker.Length)
+            }
         }
         "Modules" {
             $marker = '<Item class="Folder" referent="RBX20">'
-            $xmlContent = $xmlContent -replace "($([regex]::Escape($marker)))", "`$1$scriptXml"
+            $index = $xmlContent.IndexOf($marker)
+            if ($index -ge 0) {
+                $xmlContent = $xmlContent.Substring(0, $index + $marker.Length) + $scriptXml + $xmlContent.Substring($index + $marker.Length)
+            }
         }
         "Shared" {
             $marker = '<Item class="Folder" referent="RBX11">'
-            $xmlContent = $xmlContent -replace "($([regex]::Escape($marker)))", "`$1$scriptXml"
+            $index = $xmlContent.IndexOf($marker)
+            if ($index -ge 0) {
+                $xmlContent = $xmlContent.Substring(0, $index + $marker.Length) + $scriptXml + $xmlContent.Substring($index + $marker.Length)
+            }
         }
         "Remotes" {
             $marker = '<Item class="Folder" referent="RBX10">'
-            $xmlContent = $xmlContent -replace "($([regex]::Escape($marker)))", "`$1$scriptXml"
+            $index = $xmlContent.IndexOf($marker)
+            if ($index -ge 0) {
+                $xmlContent = $xmlContent.Substring(0, $index + $marker.Length) + $scriptXml + $xmlContent.Substring($index + $marker.Length)
+            }
         }
         "StarterPlayerScripts" {
             $marker = '<Item class="Folder" referent="RBX31">'
-            $xmlContent = $xmlContent -replace "($([regex]::Escape($marker)))", "`$1$scriptXml"
+            $index = $xmlContent.IndexOf($marker)
+            if ($index -ge 0) {
+                $xmlContent = $xmlContent.Substring(0, $index + $marker.Length) + $scriptXml + $xmlContent.Substring($index + $marker.Length)
+            }
         }
         "ClientModules" {
             $marker = '<Item class="Folder" referent="RBX31">'
-            $xmlContent = $xmlContent -replace "($([regex]::Escape($marker)))", "`$1$scriptXml"
+            $index = $xmlContent.IndexOf($marker)
+            if ($index -ge 0) {
+                $xmlContent = $xmlContent.Substring(0, $index + $marker.Length) + $scriptXml + $xmlContent.Substring($index + $marker.Length)
+            }
         }
         "StarterGui" {
             $marker = '<Item class="StarterGui" referent="RBXSTARTERGUI">'
-            $xmlContent = $xmlContent -replace "($([regex]::Escape($marker)))", "`$1$scriptXml"
+            $index = $xmlContent.IndexOf($marker)
+            if ($index -ge 0) {
+                $xmlContent = $xmlContent.Substring(0, $index + $marker.Length) + $scriptXml + $xmlContent.Substring($index + $marker.Length)
+            }
         }
     }
 }
@@ -153,6 +174,13 @@ $fileSize = (Get-Item $OutputPath).Length
 $fileSizeKB = [math]::Round($fileSize / 1KB, 2)
 
 Write-Host "  OK - File written: $fileSizeKB KB" -ForegroundColor Green
+
+# Verify script count
+if ($counter -lt 28) {
+    Write-Warning "  WARNING: Only $counter/28 scripts were found and embedded!"
+} elseif ($counter -gt 28) {
+    Write-Warning "  WARNING: $counter scripts embedded (expected 28) - possible duplicates!"
+}
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
