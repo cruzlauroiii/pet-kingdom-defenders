@@ -8,6 +8,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Players = game:GetService("Players")
 
 -- Server Modules
+local SecurityManager = require(ServerScriptService.Modules.SecurityManager) -- 2025: Initialize first for security
 local DataManager = require(ServerScriptService.Modules.DataManager)
 local PetSystem = require(ServerScriptService.Modules.PetSystem)
 local TowerDefenseManager = require(ServerScriptService.Modules.TowerDefenseManager)
@@ -25,6 +26,7 @@ print("[Server] Pet Kingdom Defenders - Initializing...")
 
 -- Initialize all systems
 local function initializeSystems()
+	SecurityManager:Initialize() -- 2025: Initialize security first
 	DataManager:Initialize()
 	PetSystem:Initialize()
 	TowerDefenseManager:Initialize()

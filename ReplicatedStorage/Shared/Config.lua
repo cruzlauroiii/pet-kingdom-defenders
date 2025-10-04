@@ -169,39 +169,65 @@ Config.OBBIES = {
 Config.MAX_TRADE_ITEMS = 4
 
 -- Shop Products (DevProducts for Robux purchases)
+-- HOW TO CREATE DEVELOPER PRODUCTS:
+-- 1. Go to: create.roblox.com
+-- 2. Select your game → Monetization → Developer Products
+-- 3. Click "Create a Developer Product"
+-- 4. Upload icon (512x512 max), enter name, description
+-- 5. Set price in Robux (minimum 1, maximum 1,000,000,000)
+-- 6. Copy the Product ID from the URL or product page
+-- 7. Replace the placeholder IDs below with your real Product IDs
+--
+-- RECOMMENDED PRODUCTS (based on 2025 best practices):
+-- - Gem Packs: Best sellers, 100/500/1000 gems
+-- - Coin Packs: For players who want quick progress
+-- - Bundles: Better value, increases ARPPU
+-- - All items are consumable (can be purchased repeatedly)
+--
+-- PRICING STRATEGY (2025):
+-- - Lower prices = more purchases (1-3% conversion typical)
+-- - Bundles = 20-30% more value than individual
+-- - Never exceed ~$50 USD (~5000 Robux) per item
+-- - Fair pricing increases player lifetime value
+
 Config.SHOP_PRODUCTS = {
-	[1234567] = {
+	-- Replace these placeholder IDs with your actual Developer Product IDs
+	[0000000001] = { -- REPLACE with real Product ID from Creator Dashboard
 		Name = "100 Gems",
 		Type = "Gems",
 		Amount = 100,
-		Price = 100 -- Robux
+		Price = 100 -- Robux (approx $1 USD)
 	},
-	[1234568] = {
+	[0000000002] = { -- REPLACE with real Product ID
 		Name = "500 Gems",
 		Type = "Gems",
 		Amount = 500,
-		Price = 400
+		Price = 400 -- Robux (approx $4 USD) - 20% bonus value
 	},
-	[1234569] = {
+	[0000000003] = { -- REPLACE with real Product ID
 		Name = "1000 Gems",
 		Type = "Gems",
 		Amount = 1000,
-		Price = 700
+		Price = 700 -- Robux (approx $7 USD) - 30% bonus value
 	},
-	[1234570] = {
+	[0000000004] = { -- REPLACE with real Product ID
 		Name = "50,000 Coins",
 		Type = "Coins",
 		Amount = 50000,
-		Price = 200
+		Price = 200 -- Robux (approx $2 USD)
 	},
-	[1234571] = {
+	[0000000005] = { -- REPLACE with real Product ID
 		Name = "Starter Bundle",
 		Type = "Bundle",
 		Gems = 250,
 		Coins = 25000,
-		Price = 300
+		Price = 300 -- Robux (approx $3 USD) - Best value for new players
 	}
 }
+
+-- NOTE: EconomyManager.lua handles the ProcessReceipt callback
+-- Test purchases in Studio with "Enable Studio Access to API Services" enabled
+-- After creating DevProducts, they appear in game within ~5 minutes
 
 -- Events
 Config.EVENTS = {

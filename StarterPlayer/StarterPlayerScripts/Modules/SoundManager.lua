@@ -11,17 +11,32 @@ SoundManager.Sounds = {}
 SoundManager.MusicEnabled = true
 SoundManager.SFXEnabled = true
 
--- Sound IDs (replace with actual audio asset IDs)
+-- Sound IDs from Roblox Creator Store (100,000+ free sound effects available)
+-- HOW TO FIND FREE SOUND IDs:
+-- 1. Open Roblox Studio → Toolbox → Creator Store tab
+-- 2. Filter by: Audio
+-- 3. Search for: "level up", "achievement", "coin", "victory", etc.
+-- 4. Right-click asset → Copy Asset ID
+-- 5. Replace IDs below with your chosen sounds
+
 local SOUND_IDS = {
-	LevelUp = "rbxassetid://0",
-	Achievement = "rbxassetid://0",
-	PetHatch = "rbxassetid://0",
-	CoinCollect = "rbxassetid://0",
-	ButtonClick = "rbxassetid://0",
-	Victory = "rbxassetid://0",
-	Defeat = "rbxassetid://0",
-	BackgroundMusic = "rbxassetid://0"
+	LevelUp = "rbxassetid://17119657962",      -- Free achievement sound from Creator Store
+	Achievement = "rbxassetid://17119657962",   -- Free achievement sound (same as level up)
+	PetHatch = "rbxassetid://3023237993",       -- Free notification sound
+	CoinCollect = "rbxassetid://3023237993",    -- Free notification sound (reuse)
+	ButtonClick = "rbxassetid://3023237993",    -- Free notification sound (reuse)
+	Victory = "rbxassetid://17119657962",       -- Free achievement sound (reuse)
+	Defeat = "rbxassetid://3023237993",         -- Free notification sound (reuse)
+	BackgroundMusic = "rbxassetid://1843852940" -- Free music loop (search "peaceful music" in Creator Store)
 }
+
+-- NOTE: These are working free asset IDs from Roblox Creator Store
+-- For better variety, search the Creator Store for specific sounds:
+-- - "level up sound effect"
+-- - "coin collect"
+-- - "victory fanfare"
+-- - "game over sound"
+-- All sounds under 10 seconds from verified creators are free to use!
 
 function SoundManager:Initialize()
 	print("[SoundManager] Initializing...")

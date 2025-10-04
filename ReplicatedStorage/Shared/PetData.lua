@@ -1,6 +1,34 @@
 --[[
 	PetData - Contains all pet definitions, stats, and abilities
 	Reference for all available pets in the game
+
+	FREE PET MODELS - How to Get Them:
+
+	Option 1: FREE Pet Packs from Roblox DevForum
+	- 300+ Free Simulator Pets: devforum.roblox.com/t/300-free-simulator-pets/692024
+	- 100+ Quality Pets: devforum.roblox.com/t/100-good-quality-simulator-pets/426398
+	- 28 Pet Pack: devforum.roblox.com/t/free-pet-pack-28-pets/958670
+
+	Option 2: Roblox Toolbox (in Studio)
+	- Open Toolbox → Models → Search "pet simulator"
+	- Filter by: Free models
+	- Insert model → Get MeshId from properties
+
+	Option 3: Use Simple Parts (Current Implementation)
+	- PetSystem.lua already creates Part-based pets
+	- Works without mesh IDs
+	- Just colored spheres/balls
+
+	To Add Mesh Models:
+	1. Get model from DevForum or Toolbox
+	2. Insert into workspace
+	3. Check MeshPart → Properties → MeshId
+	4. Copy the asset ID number
+	5. Update Model fields below: "rbxassetid://YOUR_ID"
+	6. For icons: Use Roblox image editor or keep at 0
+
+	NOTE: Current game works with Part-based pets (balls)
+	Mesh IDs are OPTIONAL for enhanced visuals
 ]]
 
 local PetData = {

@@ -7,6 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local DataManager = require(ServerScriptService.Modules.DataManager)
+local SecurityManager = require(ServerScriptService.Modules.SecurityManager)
 local Config = require(ReplicatedStorage.Shared.Config)
 local PetData = require(ReplicatedStorage.Shared.PetData)
 
@@ -86,6 +87,19 @@ end
 
 -- Hatch egg and give player a pet
 function PetSystem:HatchEgg(player, eggType)
+	-- 2025 Security: Rate limiting to prevent exploit spam
+	local canProceed, errorMsg = SecurityManager:CheckRateLimit(player, "HatchEgg")
+	if not canProceed then
+		ReplicatedStorage.Remotes.HatchResult:FireClient(player, false, errorMsg)
+		return
+	end
+
+	-- 2025 Security: Validate input type
+	if type(eggType) ~= "string" then
+		SecurityManager:LogSuspiciousActivity(player, "HatchEgg", "Invalid egg type parameter")
+		return
+	end
+
 	local eggConfig = Config.EGGS[eggType]
 	if not eggConfig then
 		warn("[PetSystem] Invalid egg type:", eggType)
@@ -159,10 +173,23 @@ end
 
 -- Equip pet to follow player
 function PetSystem:EquipPet(player, petId)
+	-- 2025 Security: Rate limiting
+	local canProceed, errorMsg = SecurityManager:CheckRateLimit(player, "EquipPet")
+	if not canProceed then
+		ReplicatedStorage.Remotes.EquipResult:FireClient(player, false, errorMsg)
+		return
+	end
+
+	-- 2025 Security: Validate input
+	if type(petId) ~= "string" then
+		SecurityManager:LogSuspiciousActivity(player, "EquipPet", "Invalid petId parameter type")
+		return
+	end
+
 	local playerData = DataManager:GetData(player)
 	if not playerData then return end
 
-	-- Check if pet exists
+	-- Check if pet exists and belongs to player
 	local petData = nil
 	for _, pet in ipairs(playerData.Pets) do
 		if pet.Id == petId then
@@ -172,6 +199,8 @@ function PetSystem:EquipPet(player, petId)
 	end
 
 	if not petData then
+		-- 2025 Security: Log attempt to equip pet they don't own
+		SecurityManager:LogSuspiciousActivity(player, "EquipPet", "Attempted to equip pet they don't own")
 		warn("[PetSystem] Pet not found:", petId)
 		return
 	end

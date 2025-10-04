@@ -61,17 +61,45 @@ local BackupDataStore
 function DataManager:Initialize()
 	print("[DataManager] Initializing...")
 
+	-- DataStore Version Management (2025 Best Practices)
+	-- IMPORTANT: Use different versions for Testing vs Production!
+	--
+	-- FOR TESTING (in Studio):
+	-- PlayerDataStore = DataStoreService:GetDataStore("PlayerData_TEST_V1")
+	-- BackupDataStore = DataStoreService:GetDataStore("PlayerDataBackup_TEST_V1")
+	--
+	-- FOR PRODUCTION (published game):
+	-- PlayerDataStore = DataStoreService:GetDataStore("PlayerData_PROD_V1")
+	-- BackupDataStore = DataStoreService:GetDataStore("PlayerDataBackup_PROD_V1")
+	--
+	-- Version Increment Rules:
+	-- - Change data structure? Increment version (V1 → V2)
+	-- - Add new fields? Keep same version (backward compatible)
+	-- - Major update? New version to avoid conflicts
+	-- - Never mix test and production data!
+	--
+	-- 2025 DataStore Updates:
+	-- - Creator Hub now has DataStore Manager (view/compare versions)
+	-- - Session locking prevents concurrent edits
+	-- - Use UpdateAsync for atomic operations
+
 	-- Initialize DataStores
 	local success, err = pcall(function()
-		PlayerDataStore = DataStoreService:GetDataStore("PlayerData_V1")
-		BackupDataStore = DataStoreService:GetDataStore("PlayerDataBackup_V1")
+		-- PRODUCTION VERSION - Change before publishing!
+		PlayerDataStore = DataStoreService:GetDataStore("PlayerData_PROD_V1")
+		BackupDataStore = DataStoreService:GetDataStore("PlayerDataBackup_PROD_V1")
+
+		-- For testing, use: PlayerData_TEST_V1
+		-- NEVER use the same name for both test and production!
 	end)
 
 	if not success then
 		warn("[DataManager] Failed to initialize DataStores:", err)
 		warn("[DataManager] Running in offline mode - data will not persist!")
+		warn("[DataManager] Enable 'Studio Access to API Services' in Game Settings")
 	end
 
+	print("[DataManager] DataStore Version: PROD_V1")
 	print("[DataManager] Initialized successfully!")
 end
 
